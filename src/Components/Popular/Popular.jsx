@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import cookiesCardImg from "../../Assets/cookies_card.jpeg";
-import chipsCardImg from "../../Assets/potatochip_card.jpeg";
-import murukuCardImg from "../../Assets/muruku_card.jpg";
-import sweetsCardImg from "../../Assets/gulabjamun_card.jpeg";
+import cookiesCardImg from "../../assets/cookies_card.jpeg";
+import chipsCardImg from "../../assets/potatochip_card.jpeg";
+import murukuCardImg from "../../assets/muruku_card.jpg";
+import sweetsCardImg from "../../assets/gulabjamun_card.jpeg";
 
 const snacks = [
   { id: 1, name: "Cookies", discount: "30%", path: "/cookies", img: cookiesCardImg },
