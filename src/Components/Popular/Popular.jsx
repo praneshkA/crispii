@@ -8,7 +8,7 @@ import sweetsCardImg from "../../assets/gulabjamun_card.jpeg";
 const snacks = [
   { id: 1, name: "Cookies", discount: "30%", path: "/cookies", img: cookiesCardImg },
   { id: 2, name: "Chips", discount: "20%", path: "/chips", img: chipsCardImg },
-  { id: 3, name: "Kaaram", discount: "15%", path: "/muruku", img: murukuCardImg },
+  { id: 3, name: "Kaaram", discount: "15%", path: "/kaaram", img: murukuCardImg },
   { id: 4, name: "Sweets", discount: "50%", path: "/sweets", img: sweetsCardImg },
 ];
 

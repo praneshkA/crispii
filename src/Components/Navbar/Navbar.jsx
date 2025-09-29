@@ -1,37 +1,88 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "../../assets/logo.png";
+import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ cartCount = 0 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <nav className="bg-gradient-to-br from-indigo-900 via-blue-900 to-purple-800 border-gray-200 shadow-sm w-full sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto flex space-x-6 overflow-x-auto px-1 no-scrollbar items-center py-2">
-        {/* Logo */}
-        <a href="/" className="flex items-center flex-shrink-0">
-          <img src={logo} alt="Logo" className="h-20 w-auto" />
-        </a>
+    <nav className="bg-gradient-to-br from-indigo-900 via-blue-900 to-purple-800 w-full sticky top-0 z-50 shadow-md">
+      <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-20">
 
-        {/* Navigation Links */}
-        <div className="flex space-x-6 items-center mt-2">
-          <a
-            href="/"
-            className="text-lg whitespace-nowrap px-1 py-3 rounded-md text-white hover:text-blue-600 hover:bg-white/10 font-semibold transition"
+        {/* Left: Hamburger */}
+        <div className="flex items-center">
+          <button
+            className="text-white md:hidden text-2xl mr-2"
+            onClick={() => setMenuOpen(!menuOpen)}
           >
-          Home
-          </a>
-          <a
-            href="/products"
-            className="text-lg whitespace-nowrap px-1 py-2 rounded-md text-white hover:text-blue-600 hover:bg-white/10 font-semibold transition"
-          >
-            Products
-          </a>
-          <a
-            href="/cart"
-            className="text-lg whitespace-nowrap px-1 py-2 rounded-md text-white hover:text-blue-600 hover:bg-white/10 font-semibold transition"
-          >
-            Cart 🛒
-          </a>
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex space-x-6">
+            <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
+              Home
+            </Link>
+            <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
+              Contact Us
+            </Link>
+            <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
+              Login
+            </Link>
+          </div>
+        </div>
+
+        {/* Center: Logo */}
+        <div className="flex-shrink-0">
+          <Link to="/">
+            <img src={logo} alt="Logo" className="h-20 mx-auto" />
+          </Link>
+        </div>
+
+        {/* Right: Cart */}
+        <div className="flex items-center">
+          <Link to="/cart" className="relative text-white text-2xl hover:text-blue-400 transition">
+            <FaShoppingCart />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
+
+      {/* Mobile Menu Sliding from Left */}
+      <div
+        className={`fixed top-0 left-0 h-full w-64 bg-indigo-800 text-white transform transition-transform duration-300 z-40
+          ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <div className="flex justify-end p-4">
+          <button onClick={() => setMenuOpen(false)} className="text-2xl">
+            <FaTimes />
+          </button>
+        </div>
+        <div className="flex flex-col mt-8 space-y-6 px-6">
+          <Link to="/" className="text-lg font-semibold hover:text-blue-400" onClick={() => setMenuOpen(false)}>
+            Home
+          </Link>
+          <Link to="/contact" className="text-lg font-semibold hover:text-blue-400" onClick={() => setMenuOpen(false)}>
+            Contact Us
+          </Link>
+          <Link to="/login" className="text-lg font-semibold hover:text-blue-400" onClick={() => setMenuOpen(false)}>
+            Login
+          </Link>
+        </div>
+      </div>
+
+      {/* Overlay */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-30"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
     </nav>
   );
 };
