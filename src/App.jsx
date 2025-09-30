@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
+import { BASE_API_URL } from "./config";
 import Hero from "./Components/Hero/Hero";
 import Popular from "./Components/Popular/Popular";
 import Offers from "./Components/Offers/Offers";
@@ -40,7 +41,7 @@ function App() {
 
   const fetchCartItems = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/cart/${userId}`);
+  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}`);
       const data = await response.json();
       setCartItems(data);
       setCartCount(data.length);
@@ -51,7 +52,7 @@ function App() {
 
   const updateCart = async (productId, selectedQuantity, quantity) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/cart/${userId}/update`, {
+  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ function App() {
 
   const removeFromCart = async (productId, selectedQuantity) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/cart/${userId}/remove`, {
+  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/remove`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

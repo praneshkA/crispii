@@ -1,5 +1,6 @@
 // frontend/src/Components/ProductList.jsx
 import React, { useEffect, useState } from "react";
+import { BASE_API_URL } from "../config";
 import { Package, ShoppingCart, Check } from "lucide-react";
 
 const ProductList = ({ category, onCartUpdate }) => {
@@ -13,8 +14,8 @@ const ProductList = ({ category, onCartUpdate }) => {
       setLoading(true);
       try {
         const url = category
-          ? `http://localhost:5000/api/products?category=${category}`
-          : `http://localhost:5000/api/products`;
+          ? `${BASE_API_URL}/api/products?category=${category}`
+          : `${BASE_API_URL}/api/products`;
         const res = await fetch(url);
         const data = await res.json();
 
@@ -43,7 +44,7 @@ const ProductList = ({ category, onCartUpdate }) => {
 
   const addToCart = async (product) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/cart/${userId}/add`, {
+  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ const ProductList = ({ category, onCartUpdate }) => {
       <div className="px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {products.map((p) => {
-            const server = "http://localhost:5000";
+              const server = BASE_API_URL;
             let imgPath = p.image || "";
             let src = imgPath.startsWith("/upload/images")
               ? `${server}${imgPath}`

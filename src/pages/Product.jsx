@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { BASE_API_URL } from '../config';
 
 function Product() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch(`${BASE_API_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error("Error fetching products:", err));
@@ -16,11 +17,26 @@ function Product() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {products.map((p) => (
           <div key={p._id} className="border rounded-lg p-2 shadow-md text-center">
-            <img
-              src={p.image}
-              alt={p.name}
-              className="h-32 w-full object-cover mb-2"
-            />
+            {
+              (() => {
+                const server = BASE_API_URL;
+                let imgPath = p.image || "";
+                let src = imgPath.startsWith("http")
+                  ? imgPath
+                  : imgPath.startsWith("/upload/images")
+                    ? `${server}${imgPath}`
+                    : `${server}/upload/images/${imgPath}`;
+                src = encodeURI(src);
+                return (
+                  <img
+                    src={src}
+                    alt={p.name}
+                    className="h-32 w-full object-cover mb-2"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "https://via.placeholder.com/150x100?text=No+Image"; }}
+                  />
+                );
+              })()
+            }
             <h2 className="font-semibold">{p.name}</h2>
             <p className="text-sm text-gray-600">{p.category}</p>
             <p className="mt-1">₹{p.prices["250g"]} (250g)</p>

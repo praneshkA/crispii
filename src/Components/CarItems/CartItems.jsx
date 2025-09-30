@@ -1,6 +1,7 @@
 // frontend/src/Components/CartItems.jsx
 import React from "react";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { BASE_API_URL } from '../../config';
 
 const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
   const calculateTotal = () => {
@@ -45,7 +46,7 @@ const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
         {/* Cart Items */}
         <div className="space-y-3 mb-6">
           {cartItems.map((item) => {
-            const server = "http://localhost:5000";
+            const server = BASE_API_URL;
             let imgPath = item.image || "";
             let src = imgPath.startsWith("/upload/images")
               ? `${server}${imgPath}`
