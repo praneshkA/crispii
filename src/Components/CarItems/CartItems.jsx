@@ -65,10 +65,11 @@ const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
                     alt={item.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "https://via.placeholder.com/80x80?text=No+Image";
-                    }}
+  e.currentTarget.onerror = null;
+  e.currentTarget.src =
+    "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+}}
+
                   />
                 </div>
 
