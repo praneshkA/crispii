@@ -122,10 +122,10 @@ const ProductList = ({ category, onCartUpdate }) => {
           {products.map((p) => {
               const server = BASE_API_URL;
             let imgPath = p.image || "";
-            let src = imgPath.startsWith("/upload/images")
-              ? `${server}${imgPath}`
-              : `${server}/upload/images/${imgPath}`;
-            src = encodeURI(src);
+let src = imgPath.startsWith("http")
+  ? imgPath
+  : `${server}${imgPath}`;
+
 
             const itemKey = `${p._id}-${p.selectedQuantity}`;
             const isAdded = addedToCart[itemKey];
@@ -141,11 +141,12 @@ const ProductList = ({ category, onCartUpdate }) => {
                     src={src}
                     alt={p.name}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "https://via.placeholder.com/300x300?text=No+Image";
-                    }}
+                   onError={(e) => {
+  e.currentTarget.onerror = null;
+  e.currentTarget.src =
+    "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+}}
+
                   />
                 </div>
 
