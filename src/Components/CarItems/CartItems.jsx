@@ -48,10 +48,10 @@ const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
           {cartItems.map((item) => {
             const server = BASE_API_URL;
             let imgPath = item.image || "";
-            let src = imgPath.startsWith("/upload/images")
-              ? `${server}${imgPath}`
-              : `${server}/upload/images/${imgPath}`;
-            src = encodeURI(src);
+let src = imgPath.startsWith("http")
+  ? imgPath
+  : `${server}${imgPath}`;
+
 
             return (
               <div
