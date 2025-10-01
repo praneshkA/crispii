@@ -67,7 +67,8 @@ let src = imgPath.startsWith("http")
                     onError={(e) => {
   e.currentTarget.onerror = null;
   e.currentTarget.src =
-    "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+  "https://res.cloudinary.com/dzvimdj7w/image/upload/v1759176000/crispii/no-image.png";
+
 }}
 
                   />

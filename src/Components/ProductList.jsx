@@ -3,11 +3,10 @@ import React, { useEffect, useState } from "react";
 import { BASE_API_URL } from "../config";
 import { Package, ShoppingCart, Check } from "lucide-react";
 
-const ProductList = ({ category, onCartUpdate }) => {
+const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState({});
-  const userId = 'guest'; // You can replace this with actual user ID from authentication
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -44,7 +43,7 @@ const ProductList = ({ category, onCartUpdate }) => {
 
   const addToCart = async (product) => {
     try {
-  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
+      const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import { BASE_API_URL } from "./config";
@@ -15,44 +15,54 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReturnExchange from "./pages/ReturnExchange";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import LoginSignup from "./pages/LoginSignUP.jsx";
 
 // Product List Component
 import ProductList from "./Components/ProductList.jsx";
 import CartItems from "./Components/CarItems/CartItems.jsx";
+import ScrollingBanner from "./Components/ScrollingBanner/ScrollingBanner.jsx";
 
 // Home page content
 const HomePage = () => (
   <>
+  <ScrollingBanner />
     <Popular />
     <Hero />
     <Offers />
+    
   </>
 );
 
 function App() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
-  const userId = 'guest'; // Replace with actual user ID when you implement authentication
 
-  // Fetch cart items on mount
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
+  // Auth state: token and userId stored in sessionStorage
+  const [auth, setAuth] = useState({
+    token: sessionStorage.getItem('authToken') || null,
+    userId: sessionStorage.getItem('userId') || 'guest'
+  });
+  const userId = auth.userId || 'guest';
 
-  const fetchCartItems = async () => {
+  // Fetch cart items (stable reference)
+  const fetchCartItems = useCallback(async () => {
     try {
-  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}`);
+      const response = await fetch(`${BASE_API_URL}/api/cart/${userId}`);
       const data = await response.json();
       setCartItems(data);
       setCartCount(data.length);
     } catch (err) {
       console.error("Error fetching cart:", err);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchCartItems();
+  }, [fetchCartItems]);
 
   const updateCart = async (productId, selectedQuantity, quantity) => {
     try {
-  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/update`, {
+      const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +80,7 @@ function App() {
 
   const removeFromCart = async (productId, selectedQuantity) => {
     try {
-  const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/remove`, {
+      const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/remove`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -91,12 +101,25 @@ function App() {
     fetchCartItems();
   };
 
+  // Handle successful login/signup: store token and userId
+  const handleAuth = ({ token, userId }) => {
+    sessionStorage.setItem('authToken', token);
+    sessionStorage.setItem('userId', userId);
+    setAuth({ token, userId });
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userId');
+    setAuth({ token: null, userId: 'guest' });
+  };
+
   // Category pages using ProductList with cart functionality
-  const ChipsPage = () => <ProductList category="Chips" onCartUpdate={handleCartUpdate} />;
-  const CookiesPage = () => <ProductList category="Cookies / Biscuits" onCartUpdate={handleCartUpdate} />;
-  const KaaramPage = () => <ProductList category="Kaaram" onCartUpdate={handleCartUpdate} />;
-  const SweetPage = () => <ProductList category="Sweets / Mithai" onCartUpdate={handleCartUpdate} />;
-  const AllProductsPage = () => <ProductList category={null} onCartUpdate={handleCartUpdate} />;
+  const ChipsPage = () => <ProductList category="Chips" onCartUpdate={handleCartUpdate} userId={userId} />;
+  const CookiesPage = () => <ProductList category="Cookies / Biscuits" onCartUpdate={handleCartUpdate} userId={userId} />;
+  const KaaramPage = () => <ProductList category="Kaaram" onCartUpdate={handleCartUpdate} userId={userId} />;
+  const SweetPage = () => <ProductList category="Sweets / Mithai" onCartUpdate={handleCartUpdate} userId={userId} />;
+  const AllProductsPage = () => <ProductList category={null} onCartUpdate={handleCartUpdate} userId={userId} />;
 
   // Cart page
   const CartPage = () => (
@@ -109,7 +132,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navbar cartCount={cartCount} />
+      <Navbar cartCount={cartCount} auth={auth} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<AllProductsPage />} />
@@ -125,6 +148,7 @@ function App() {
         <Route path="/return-exchange" element={<ReturnExchange />} />
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+  <Route path="/login" element={<LoginSignup onAuthSuccess={handleAuth} />} />
       </Routes>
       <Footer />
     </BrowserRouter>
