@@ -165,7 +165,7 @@ const LoginSignup = ({ onAuthSuccess }) => {
                   placeholder="Email Address"
                   className={`w-full bg-white/90 border ${
                     errors.email ? 'border-red-400' : 'border-black/80'
-                  } rounded-lg py-2.5 sm:py-3 pl-9 sm:pl-10 pr-3 sm:pr-4 text-sm sm:text-base text-white placeholder-black/80 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all`}
+                  } rounded-lg py-2.5 sm:py-3 pl-9 sm:pl-10 pr-3 sm:pr-4 text-sm sm:text-base text-black placeholder-black/80 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all`}
                 />
               </div>
               {errors.email && (
