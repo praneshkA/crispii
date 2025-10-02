@@ -2,8 +2,11 @@
 import React from "react";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { BASE_API_URL } from '../../config';
+import { useNavigate } from "react-router-dom";
 
 const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
+  const navigate = useNavigate();
+
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
       return total + (item.price * item.quantity);
@@ -48,10 +51,9 @@ const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
           {cartItems.map((item) => {
             const server = BASE_API_URL;
             let imgPath = item.image || "";
-let src = imgPath.startsWith("http")
-  ? imgPath
-  : `${server}${imgPath}`;
-
+            let src = imgPath.startsWith("http")
+              ? imgPath
+              : `${server}${imgPath}`;
 
             return (
               <div
@@ -65,12 +67,10 @@ let src = imgPath.startsWith("http")
                     alt={item.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-  e.currentTarget.onerror = null;
-  e.currentTarget.src =
-  "https://res.cloudinary.com/dzvimdj7w/image/upload/v1759176000/crispii/no-image.png";
-
-}}
-
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src =
+                        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1759176000/crispii/no-image.png";
+                    }}
                   />
                 </div>
 
@@ -127,7 +127,12 @@ let src = imgPath.startsWith("http")
               ₹{calculateTotal().toFixed(2)}
             </span>
           </div>
-          <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors">
+
+          {/* Checkout Button */}
+          <button
+            onClick={() => navigate("/checkout")}
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-6 rounded-xl shadow transition-transform duration-200 hover:scale-105 focus:ring-2 focus:ring-yellow-300"
+          >
             Proceed to Checkout
           </button>
         </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom"; 
 const Hero = () => {
   return (
-    <section className="bg-gradient-to-br   from-yellow-500  via-violet-900 to-blue-800  rounded-3xl px-6 py-16 mx-4 md:mx-20 lg:mx-40 mb-10 shadow-lg flex flex-col items-center animate-fadeInUp max-w-7xl mx-auto">
+    <section className="bg-gradient-to-br   from-pink-700   to-blue-900  rounded-3xl px-6 py-16 mx-4 md:mx-20 lg:mx-40 mb-10 shadow-lg flex flex-col items-center animate-fadeInUp max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 text-center leading-tight max-w-3xl">
         Diwali Sale! <span role="img" aria-label="confetti">🎉</span>
       </h1>

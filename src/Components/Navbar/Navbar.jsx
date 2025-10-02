@@ -7,7 +7,7 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-gradient-to-br from-yellow-500 via-violet-900 to-blue-800 w-full sticky top-0 z-50 shadow-md">
+    <nav className="bg-gradient-to-br from-pink-700  to-blue-800 w-full sticky top-0 z-50 shadow-md">
       <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-20">
         
         {/* Left: Hamburger + Links */}

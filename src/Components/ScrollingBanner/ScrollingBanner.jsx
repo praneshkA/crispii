@@ -2,7 +2,7 @@
 import React from "react";
 
 const ScrollingBanner = () => {
-  const messages = ["No preservatives","100% Authentic Taste", "No palm oil", "100% Natural"]; // Add your messages
+  const messages = ["Free delivery on orders above 349","No preservatives","100% Authentic Taste", "No palm oil", "100% Natural"]; // Add your messages
 
   return (
     <div className="overflow-hidden bg-[#FFFDD0] text-black rounded-3xl px-1 py-1 mx-1 md:mx-10 ">

@@ -3,7 +3,7 @@ import { FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-br from-yellow-500  via-violet-900 to-blue-800 rounded-3xl px-6 py-12 mx-4 text-white">
+    <footer className="bg-gradient-to-br from-pink-500   to-blue-800 rounded-3xl px-6 py-12 mx-4 text-white">
       <div className="max-w-4xl mx-auto space-y-8">
 
         {/* Address Section */}
