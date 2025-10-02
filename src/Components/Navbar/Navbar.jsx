@@ -25,6 +25,9 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout }) => {
             <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
               Home
             </Link>
+            <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
+              My Orders
+            </Link>
             <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
               Contact Us
             </Link>
@@ -76,6 +79,9 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout }) => {
         <div className="flex flex-col mt-8 space-y-6 px-6">
           <Link to="/" className="text-lg font-semibold hover:text-blue-400" onClick={() => setMenuOpen(false)}>
             Home
+          </Link>
+          <Link to="/myorders" className="text-lg font-semibold hover:text-blue-400" onClick={() => setMenuOpen(false)}>
+            My Orders
           </Link>
           <Link to="/contact" className="text-lg font-semibold hover:text-blue-400" onClick={() => setMenuOpen(false)}>
             Contact Us

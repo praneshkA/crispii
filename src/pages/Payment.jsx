@@ -51,6 +51,8 @@ const Payment = () => {
       // Convert image to base64
       const reader = new FileReader();
       reader.readAsDataURL(file);
+
+      
       
       reader.onloadend = async () => {
         const base64Image = reader.result;

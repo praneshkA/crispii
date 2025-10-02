@@ -23,7 +23,7 @@ import Payment from "./pages/Payment.jsx";
 import ProductList from "./Components/ProductList.jsx";
 import CartItems from "./Components/CartItems/CartItems.jsx"; // fixed folder typo
 import ScrollingBanner from "./Components/ScrollingBanner/ScrollingBanner.jsx";
-
+import WhatsAppButton from "./Components/WhatsAppButton/WhatsAppButton.jsx";
 // Home page content
 const HomePage = () => (
   <>
@@ -31,6 +31,7 @@ const HomePage = () => (
     <Popular />
     <Hero />
     <Offers />
+    <WhatsAppButton />
   </>
 );
 
