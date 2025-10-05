@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { BASE_API_URL } from "../config";
 import { Package, ShoppingCart, Check } from "lucide-react";
+import BackToHome from "./BackToHome/BackToHome";
 
-const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
+const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState({});
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -41,12 +43,27 @@ const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
     );
   };
 
+  const showNotification = (productName) => {
+    const id = Date.now();
+    const newNotification = {
+      id,
+      message: `${productName} added to your cart`,
+    };
+    
+    setNotifications(prev => [...prev, newNotification]);
+    
+    // Remove notification after animation completes
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 2000);
+  };
+
   const addToCart = async (product) => {
     try {
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           productId: product._id,
@@ -54,24 +71,27 @@ const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
           image: product.image,
           selectedQuantity: product.selectedQuantity,
           price: product.prices[product.selectedQuantity],
-          quantity: 1
+          quantity: 1,
         }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
-        // Show added animation
-        setAddedToCart(prev => ({
+        // Show added animation on button
+        setAddedToCart((prev) => ({
           ...prev,
-          [`${product._id}-${product.selectedQuantity}`]: true
+          [`${product._id}-${product.selectedQuantity}`]: true,
         }));
 
-        // Remove animation after 2 seconds
+        // Show floating notification
+        showNotification(product.name);
+
+        // Remove button animation after 2 seconds
         setTimeout(() => {
-          setAddedToCart(prev => ({
+          setAddedToCart((prev) => ({
             ...prev,
-            [`${product._id}-${product.selectedQuantity}`]: false
+            [`${product._id}-${product.selectedQuantity}`]: false,
           }));
         }, 2000);
 
@@ -83,8 +103,6 @@ const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
     } catch (err) {
       console.error("Error adding to cart:", err);
     }
-    
-    return false;
   };
 
   if (loading) {
@@ -105,12 +123,38 @@ const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
   }
 
   return (
-    <div className="w-full bg-gray-50 pb-6">
-      {/* Header */}
-      <div className="bg-white shadow-sm mb-4">
-        <div className="px-4 py-3">
-          <h1 className="text-lg font-bold text-gray-800">
-            {category ? category.charAt(0).toUpperCase() + category.slice(1) : "All Products"}
+    <div className="w-full bg-gray-50 pb-6 relative">
+      {/* Floating Notifications Container */}
+      <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className="mb-2 animate-float-up"
+            style={{
+              animation: 'floatUp 3s ease-out forwards',
+            }}
+          >
+            <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 min-w-[250px]">
+              <div className="bg-white/20 rounded-full p-1">
+                <Check size={20} className="text-white" />
+              </div>
+              <span className="text-sm font-medium">{notification.message}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Header with Back Arrow */}
+      <div className="w-full bg-white/70 shadow-sm">
+        <div className="max-w-screen-xl mx-auto flex items-center px-4 py-3 sm:py-5">
+          {/* Back button - now receives isMenuOpen prop */}
+          <BackToHome isMenuOpen={isMenuOpen} />
+
+          {/* Title */}
+          <h1 className="text-lg sm:text-xl font-bold text-gray-800 ml-9 truncate">
+            {category
+              ? category.charAt(0).toUpperCase() + category.slice(1)
+              : "All Products"}
           </h1>
         </div>
       </div>
@@ -119,12 +163,11 @@ const ProductList = ({ category, onCartUpdate, userId = 'guest' }) => {
       <div className="px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {products.map((p) => {
-              const server = BASE_API_URL;
+            const server = BASE_API_URL;
             let imgPath = p.image || "";
-let src = imgPath.startsWith("http")
-  ? imgPath
-  : `${server}${imgPath}`;
-
+            let src = imgPath.startsWith("http")
+              ? imgPath
+              : `${server}${imgPath}`;
 
             const itemKey = `${p._id}-${p.selectedQuantity}`;
             const isAdded = addedToCart[itemKey];
@@ -140,12 +183,11 @@ let src = imgPath.startsWith("http")
                     src={src}
                     alt={p.name}
                     className="w-full h-full object-cover"
-                   onError={(e) => {
-  e.currentTarget.onerror = null;
-  e.currentTarget.src =
-    "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
-}}
-
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src =
+                        "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                    }}
                   />
                 </div>
 
@@ -186,13 +228,12 @@ let src = imgPath.startsWith("http")
                             e.preventDefault();
                             e.stopPropagation();
                             addToCart(p);
-                            return false;
                           }}
                           disabled={isAdded}
                           className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm font-semibold transition-all ${
                             isAdded
-                              ? 'bg-green-500 text-white'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white'
+                              ? "bg-green-500 text-white"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
                           }`}
                         >
                           {isAdded ? (

@@ -18,12 +18,14 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import LoginSignup from "./pages/LoginSignUP.jsx";
 import Payment from "./pages/Payment.jsx";
+import MyOrder from "./pages/MyOrder.jsx";
 
 // Product List Component
 import ProductList from "./Components/ProductList.jsx";
-import CartItems from "./Components/CartItems/CartItems.jsx"; // fixed folder typo
+import CartItems from "./Components/CartItems/CartItems.jsx";
 import ScrollingBanner from "./Components/ScrollingBanner/ScrollingBanner.jsx";
 import WhatsAppButton from "./Components/WhatsAppButton/WhatsAppButton.jsx";
+
 // Home page content
 const HomePage = () => (
   <>
@@ -38,6 +40,7 @@ const HomePage = () => (
 function App() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false); // Added state for menu
 
   const [auth, setAuth] = useState({
     token: sessionStorage.getItem("authToken") || null,
@@ -109,12 +112,13 @@ function App() {
     setAuth({ token: null, userId: "guest" });
   };
 
-  // Category pages
+  // Category pages - now pass isMenuOpen prop
   const ChipsPage = () => (
     <ProductList
       category="Chips"
       onCartUpdate={handleCartUpdate}
       userId={userId}
+      isMenuOpen={menuOpen}
     />
   );
   const CookiesPage = () => (
@@ -122,6 +126,7 @@ function App() {
       category="Cookies / Biscuits"
       onCartUpdate={handleCartUpdate}
       userId={userId}
+      isMenuOpen={menuOpen}
     />
   );
   const KaaramPage = () => (
@@ -129,6 +134,7 @@ function App() {
       category="Kaaram"
       onCartUpdate={handleCartUpdate}
       userId={userId}
+      isMenuOpen={menuOpen}
     />
   );
   const SweetPage = () => (
@@ -136,10 +142,16 @@ function App() {
       category="Sweets / Mithai"
       onCartUpdate={handleCartUpdate}
       userId={userId}
+      isMenuOpen={menuOpen}
     />
   );
   const AllProductsPage = () => (
-    <ProductList category={null} onCartUpdate={handleCartUpdate} userId={userId} />
+    <ProductList 
+      category={null} 
+      onCartUpdate={handleCartUpdate} 
+      userId={userId}
+      isMenuOpen={menuOpen}
+    />
   );
 
   // Cart page
@@ -148,13 +160,19 @@ function App() {
       cartItems={cartItems}
       updateCart={updateCart}
       removeFromCart={removeFromCart}
-      userId={userId} // pass userId if needed
+      userId={userId}
     />
   );
 
   return (
     <BrowserRouter>
-      <Navbar cartCount={cartCount} auth={auth} onLogout={handleLogout} />
+      <Navbar 
+        cartCount={cartCount} 
+        auth={auth} 
+        onLogout={handleLogout}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+      />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<AllProductsPage />} />
@@ -170,10 +188,10 @@ function App() {
         <Route path="/return-exchange" element={<ReturnExchange />} />
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/my-order" element={<MyOrder />} />
         <Route path="/login" element={<LoginSignup onAuthSuccess={handleAuth} />} />
         <Route path="/checkout" element={<Checkout cartItems={cartItems} />} />
         <Route path="/payment" element={<Payment />} />
-
       </Routes>
       <Footer />
     </BrowserRouter>

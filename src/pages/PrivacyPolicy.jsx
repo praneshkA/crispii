@@ -10,7 +10,6 @@ const PrivacyPolicy = () => {
       <ul className="list-disc list-inside text-lg">
         <li>We collect basic information such as name, email, and phone number to process orders and inquiries.</li>
         <li>We never share your personal data with third parties without your consent.</li>
-        <li>Our website uses cookies to enhance your browsing experience.</li>
       </ul>
     </div>
   );

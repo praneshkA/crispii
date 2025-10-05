@@ -25,6 +25,18 @@ const Payment = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(selectedFile.type)) {
+        alert('Please upload a valid image file (JPG, PNG, GIF, WEBP)');
+        return;
+      }
+      // Validate file size (5MB)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
       setFile(selectedFile);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -48,60 +60,60 @@ const Payment = () => {
     setLoading(true);
 
     try {
-      // Convert image to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
+      // Create FormData object
+      const formDataObj = new FormData();
       
-      
-      reader.onloadend = async () => {
-        const base64Image = reader.result;
+      // Get userId from sessionStorage (from login/signup)
+      const userId = sessionStorage.getItem("userId") || "guest";
+      formDataObj.append('userId', userId);
 
-        // Get userId from localStorage (if you have auth)
-        const userId = localStorage.getItem("userId") || "guest";
+      // Add customer details as JSON string
+      formDataObj.append('customerDetails', JSON.stringify(formData));
 
-        // Prepare order data
-        const orderData = {
-          userId,
-          customerDetails: formData,
-          items: cartItems.map(item => ({
-            productId: item.productId,
-            name: item.name,
-            image: item.image,
-            selectedQuantity: item.selectedQuantity,
-            price: item.price,
-            quantity: item.quantity,
-          })),
-          totalAmount,
-          paymentScreenshot: base64Image,
-        };
+      // Add cart items as JSON string
+      const items = cartItems.map(item => ({
+        productId: item._id || item.productId,
+        name: item.name,
+        image: item.image,
+        selectedQuantity: item.selectedQuantity,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+      formDataObj.append('items', JSON.stringify(items));
 
-        // Send to backend
-        const response = await fetch("http://localhost:5000/api/orders", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orderData),
-        });
+      // Add total amount
+      formDataObj.append('totalAmount', totalAmount);
 
-        const data = await response.json();
+      // Add payment screenshot file
+      formDataObj.append('paymentScreenshot', file);
 
-        if (data.success) {
-          setOrderId(data.orderId);
-          setUploaded(true);
-          
-          // Optional: Clear cart after successful order
-          // You can call your cart clear API here
-        } else {
-          alert(data.message || "Failed to create order");
+      // Send to backend
+      const response = await fetch("http://localhost:5000/api/orders", {
+        method: "POST",
+        body: formDataObj, // Don't set Content-Type header - browser will set it automatically with boundary
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setOrderId(data.orderId);
+        setUploaded(true);
+        
+        // Store userId for order tracking
+        if (!localStorage.getItem('userId')) {
+          localStorage.setItem('userId', userId);
         }
-      };
-
-      reader.onerror = () => {
-        alert("Failed to read file");
-        setLoading(false);
-      };
+        
+        // Store order ID for tracking
+        const myOrders = JSON.parse(localStorage.getItem('myOrders') || '[]');
+        myOrders.push(data.orderId);
+        localStorage.setItem('myOrders', JSON.stringify(myOrders));
+        
+        // Optional: Clear cart after successful order
+        localStorage.removeItem('cart');
+      } else {
+        alert(data.message || "Failed to create order");
+      }
     } catch (error) {
       console.error("Order submission error:", error);
       alert("Failed to submit order. Please try again.");
@@ -176,7 +188,7 @@ const Payment = () => {
               />
             </div>
             <div className="mt-5 text-center">
-              <p className="text-sm font-semibold text-gray-700">UPI ID:praneshalagesan@okicici</p>
+              <p className="text-sm font-semibold text-gray-700">UPI ID: praneshalagesan@okicici</p>
               <p className="text-xs text-gray-500 mt-6">
                 Use any UPI app to complete payment
               </p>
@@ -205,7 +217,7 @@ const Payment = () => {
                       Click to upload or drag and drop
                     </p>
                     <p className="text-xs text-gray-500">
-                      PNG, JPG up to 10MB
+                      PNG, JPG up to 5MB
                     </p>
                   </label>
                 </div>

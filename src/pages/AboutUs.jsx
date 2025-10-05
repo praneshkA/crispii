@@ -8,7 +8,7 @@ const AboutUs = () => {
         Welcome to Crispii Pvt. Ltd., your one-stop destination for the finest savory snacks.
       </p>
       <p className="text-lg mb-2">
-        Founded in 2020, we are committed to delivering fresh, high-quality snacks made from traditional recipes with a modern touch.
+        Founded in 2025, we are committed to delivering fresh, high-quality snacks made from traditional recipes with a modern touch.
       </p>
       <p className="text-lg">
         Our mission is to bring joy to snack lovers everywhere by offering delicious treats crafted with care and packed with flavor.
