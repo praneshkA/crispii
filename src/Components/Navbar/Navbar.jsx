@@ -52,7 +52,7 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
       <div className="max-w-6xl mx-auto px-4 h-20">
         <div className="grid grid-cols-3 items-center h-full">
           {/* Left: Hamburger + Mobile favourites (Mobile) / Desktop Links (Desktop) */}
-          <div className="flex items-center justify-start">
+          <div className="flex items-center justify-start md:-ml-6">
             {/* Hamburger (mobile only) */}
             <button
               className="text-white md:hidden text-2xl mr-4 hover:scale-110 transition-transform duration-200"
@@ -74,29 +74,30 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
             </div>
 
             {/* Desktop Links */}
-            <div className="hidden md:flex space-x-5 items-center">
-              <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
-                Home
-              </Link>
-              <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
-                My Orders
-              </Link>
-              <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
-                Contact Us
-              </Link>
-              {auth && auth.userId && auth.userId !== "guest" ? (
-                <button
-                  onClick={() => onLogout && onLogout()}
-                  className="text-white font-semibold hover:text-blue-400 transition"
-                >
-                  Logout
-                </button>
-              ) : (
-                <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
-                  Login/Signup
-                </Link>
-              )}
-            </div>
+<div className="hidden md:flex space-x-5 items-center absolute left-8 top-1/2 -translate-y-1/2">
+    <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
+      Home
+    </Link>
+    <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
+      My Orders
+    </Link>
+    <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
+      Contact Us
+    </Link>
+    {auth && auth.userId && auth.userId !== "guest" ? (
+      <button
+        onClick={() => onLogout && onLogout()}
+        className="text-white font-semibold hover:text-blue-400 transition"
+      >
+        Logout
+      </button>
+    ) : (
+      <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
+        Login/Signup
+      </Link>
+    )}
+  </div>
+
           </div>
 
           {/* Center: Logo */}
@@ -107,7 +108,7 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
           </div>
 
           {/* Right: Search (button), Favourites (desktop), Cart */}
-          <div className="flex items-center gap-6 justify-end">
+          <div className="flex items-center  gap-7 justify-end">
             {/* Search Icon triggers modal (visible on all sizes, placed on the right) */}
             <button
               className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none"
