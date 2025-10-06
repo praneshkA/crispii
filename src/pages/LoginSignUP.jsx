@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 import { BASE_API_URL } from '../config';
 
@@ -58,6 +58,7 @@ const LoginSignup = ({ onAuthSuccess }) => {
 
   // router navigate
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,12 +96,26 @@ const LoginSignup = ({ onAuthSuccess }) => {
         if (response.ok && data && data.success) {
         sessionStorage.setItem('authToken', data.token);
         sessionStorage.setItem('userId', data.userId);
+        // Also persist the userId in localStorage after a successful auth
+        try {
+          localStorage.setItem('userId', data.userId);
+        } catch {
+          // ignore quota errors
+        }
         // Notify parent (App) about successful auth
         if (onAuthSuccess) onAuthSuccess({ token: data.token, userId: data.userId });
         console.log(`${isLogin ? 'Login' : 'Signup'} successful! Redirecting...`);
         alert(`Success! You are now ${isLogin ? 'logged in' : 'signed up'}.`);
-        // Redirect to home
-        navigate('/');
+        // If caller provided a return location via router state, navigate there
+        const locState = location.state || {};
+        const returnState = locState.returnState || null;
+        const from = locState.from || null;
+        if (from === '/payment' && returnState) {
+          // navigate back to payment and restore state
+          navigate('/payment', { state: returnState });
+        } else {
+          navigate('/');
+        }
       } else {
           setServerError((data && data.message) || 'Authentication failed');
       }

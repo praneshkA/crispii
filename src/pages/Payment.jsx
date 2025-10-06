@@ -23,6 +23,16 @@ const Payment = () => {
     }
   }, [formData, cartItems, navigate]);
 
+  // Require authentication before placing an order
+  React.useEffect(() => {
+    const authToken = sessionStorage.getItem('authToken');
+    const userId = sessionStorage.getItem('userId') || 'guest';
+    if (!authToken || userId === 'guest') {
+      // redirect to login/signup and include return state so user comes back here
+      navigate('/login', { state: { from: '/payment', returnState: { formData, cartItems, totalAmount } } });
+    }
+  }, [formData, cartItems, totalAmount, navigate]);
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -94,26 +104,23 @@ const Payment = () => {
         body: formDataObj, // Don't set Content-Type header - browser will set it automatically with boundary
       });
 
-      const data = await response.json();
+      const orderResp = await response.json();
 
-      if (data.success) {
-        setOrderId(data.orderId);
+      if (orderResp.success) {
+        setOrderId(orderResp.orderId);
         setUploaded(true);
         
-        // Store userId for order tracking
-        if (!localStorage.getItem('userId')) {
-          localStorage.setItem('userId', userId);
-        }
+        // userId is stored in sessionStorage upon login; no need to persist in localStorage
         
         // Store order ID for tracking
         const myOrders = JSON.parse(localStorage.getItem('myOrders') || '[]');
-        myOrders.push(data.orderId);
+        myOrders.push(orderResp.orderId);
         localStorage.setItem('myOrders', JSON.stringify(myOrders));
         
         // Optional: Clear cart after successful order
         localStorage.removeItem('cart');
       } else {
-        alert(data.message || "Failed to create order");
+        alert(orderResp.message || "Failed to create order");
       }
     } catch (error) {
       console.error("Order submission error:", error);

@@ -4,8 +4,17 @@ import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { BASE_API_URL } from '../../config';
 import { useNavigate } from "react-router-dom";
 
-const CartItems = ({ cartItems, updateCart, removeFromCart }) => {
+const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
   const navigate = useNavigate();
+
+  // If user is not logged in, redirect to login page
+  React.useEffect(() => {
+    const authToken = sessionStorage.getItem('authToken');
+    const uid = userId || sessionStorage.getItem('userId') || 'guest';
+    if (!authToken || uid === 'guest') {
+      navigate('/login', { state: { from: '/cart' } });
+    }
+  }, [navigate, userId]);
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {

@@ -1,4 +1,4 @@
-// src/App.jsx
+// App.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
@@ -19,6 +19,7 @@ import TermsOfService from "./pages/TermsOfService";
 import LoginSignup from "./pages/LoginSignUP.jsx";
 import Payment from "./pages/Payment.jsx";
 import MyOrder from "./pages/MyOrder.jsx";
+import Favourites from "./pages/Favourites.jsx";
 
 // Product List Component
 import ProductList from "./Components/ProductList.jsx";
@@ -42,18 +43,18 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false); // Added state for menu
 
-  const [auth, setAuth] = useState({
+  const [auth, setAuth] = useState(() => ({
     token: sessionStorage.getItem("authToken") || null,
-    userId: sessionStorage.getItem("userId") || "guest",
-  });
+    userId: sessionStorage.getItem("authToken") ? (sessionStorage.getItem("userId") || "guest") : "guest",
+  }));
   const userId = auth.userId || "guest";
 
   const fetchCartItems = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}`);
-      const data = await response.json();
-      setCartItems(data);
-      setCartCount(data.length);
+  const cart = await response.json();
+  setCartItems(cart);
+  setCartCount(cart.length);
     } catch (err) {
       console.error("Error fetching cart:", err);
     }
@@ -109,6 +110,7 @@ function App() {
   const handleLogout = () => {
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("userId");
+  try { localStorage.removeItem('userId'); } catch { /* ignore */ }
     setAuth({ token: null, userId: "guest" });
   };
 
@@ -181,6 +183,8 @@ function App() {
         <Route path="/kaaram" element={<KaaramPage />} />
         <Route path="/sweets" element={<SweetPage />} />
         <Route path="/cart" element={<CartPage />} />
+
+        <Route path="/favourites" element={<Favourites />} />
 
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />

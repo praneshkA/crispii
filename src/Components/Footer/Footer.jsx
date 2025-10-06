@@ -1,79 +1,108 @@
 import React from "react";
-import { FaInstagram } from "react-icons/fa";
+import { Instagram } from "lucide-react";
 import { motion as Motion } from "framer-motion";
 
 const Footer = () => {
   return (
     <Motion.footer
-      className="bg-gradient-to-br from-pink-500 to-blue-800 rounded-3xl px-6 py-12 mx-4 text-white"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-700 text-white"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
       viewport={{ once: true }}
     >
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Company Name */}
-        <Motion.div
-          className="text-center md:text-left"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <h2 className="text-2xl font-bold mb-1">Crispii Pvt. Ltd.</h2>
-        </Motion.div>
-
-        {/* Links Section */}
-        <Motion.div
-          className="flex flex-wrap justify-center md:justify-start gap-4 text-sm"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-        >
-          {[
-            { href: "/about", label: "About Us" },
-            { href: "/contact", label: "Contact Us" },
-            { href: "/privacy-policy", label: "Privacy Policy" },
-            { href: "/return-exchange", label: "Return & Exchange Policy" },
-            { href: "/shipping-policy", label: "Shipping Policy" },
-            { href: "/terms-of-service", label: "Terms of Service" },
-          ].map((link, index) => (
-            <Motion.a
-              key={index}
-              href={link.href}
-              className="hover:underline hover:text-yellow-300 transition-colors duration-200"
-              whileHover={{ scale: 1.1 }}
-            >
-              {link.label}
-            </Motion.a>
-          ))}
-        </Motion.div>
-
-        {/* Instagram Icon */}
-        <Motion.div
-          className="flex justify-center md:justify-start pt-2 text-2xl"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <Motion.a
-            href="https://www.instagram.com/crispii_snacks"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-pink-400 transition-colors duration-300"
-            whileHover={{ rotate: 10, scale: 1.2 }}
+      {/* Main Content */}
+      <div className="px-8 py-16 md:px-16 lg:px-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+          {/* Brand Section */}
+          <Motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
           >
-            <FaInstagram />
-          </Motion.a>
-        </Motion.div>
+            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
+              Crispii Pvt Ldt
+            </h2>
+            <p className="text-white/80 text-sm leading-relaxed">
+              Premium snacks delivered with love. Quality you can taste, service you can trust.
+            </p>
+            <Motion.a
+              href="https://www.instagram.com/crispii_snacks"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-6 text-lg hover:text-pink-300 transition-colors"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Instagram size={24} />
+              <span className="text-sm font-medium">@crispii_snacks</span>
+            </Motion.a>
+          </Motion.div>
 
-        {/* Copyright */}
+          {/* Quick Links */}
+          <Motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
+            <h3 className="text-lg font-semibold mb-6 text-yellow-300">Quick Links</h3>
+            <ul className="space-y-3">
+              {[
+                { href: "/about", label: "About Us" },
+                { href: "/contact", label: "Contact Us" },
+                { href: "/shipping-policy", label: "Shipping Policy" },
+              ].map((link, index) => (
+                <li key={index}>
+                  <Motion.a
+                    href={link.href}
+                    className="text-white/90 hover:text-white hover:translate-x-1 inline-block transition-all duration-200"
+                    whileHover={{ x: 4 }}
+                  >
+                    {link.label}
+                  </Motion.a>
+                </li>
+              ))}
+            </ul>
+          </Motion.div>
+
+          {/* Policies */}
+          <Motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            <h3 className="text-lg font-semibold mb-6 text-yellow-300">Legal</h3>
+            <ul className="space-y-3">
+              {[
+                { href: "/privacy-policy", label: "Privacy Policy" },
+                { href: "/return-exchange", label: "Return & Exchange" },
+                { href: "/terms-of-service", label: "Terms of Service" },
+              ].map((link, index) => (
+                <li key={index}>
+                  <Motion.a
+                    href={link.href}
+                    className="text-white/90 hover:text-white hover:translate-x-1 inline-block transition-all duration-200"
+                    whileHover={{ x: 4 }}
+                  >
+                    {link.label}
+                  </Motion.a>
+                </li>
+              ))}
+            </ul>
+          </Motion.div>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-white/20 mb-8"></div>
+
+        {/* Bottom Bar */}
         <Motion.div
-          className="text-center md:text-left text-white/90 text-sm pt-4"
+          className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/70"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
         >
-          © 2025 Crispii. All rights reserved.
+          <p>© 2025 Crispii Pvt. Ltd. All rights reserved.</p>
+          <p>Made with ❤️ in India</p>
         </Motion.div>
       </div>
     </Motion.footer>

@@ -1,7 +1,8 @@
-// frontend/src/Components/ProductList.jsx
+//ProductList.jsx
 import React, { useEffect, useState } from "react";
 import { BASE_API_URL } from "../config";
 import { Package, ShoppingCart, Check } from "lucide-react";
+import { FaHeart } from "react-icons/fa";
 import BackToHome from "./BackToHome/BackToHome";
 
 const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) => {
@@ -9,6 +10,18 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState({});
   const [notifications, setNotifications] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [favourites, setFavourites] = useState([]);
+  // userId is already provided as a prop
+
+  const fetchFavourites = async () => {
+    const favs = JSON.parse(localStorage.getItem('favourites') || '[]');
+    setFavourites(favs);
+  };
+
+  useEffect(() => {
+    fetchFavourites();
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -43,19 +56,31 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
     );
   };
 
-  const showNotification = (productName) => {
+  const showNotification = (message) => {
     const id = Date.now();
-    const newNotification = {
-      id,
-      message: `${productName} added to your cart`,
-    };
-    
-    setNotifications(prev => [...prev, newNotification]);
-    
-    // Remove notification after animation completes
+    setNotifications((prev) => [...prev, { id, message }]);
     setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
     }, 2000);
+  };
+
+  const toggleFavourite = async (product) => {
+    let favs = JSON.parse(localStorage.getItem('favourites') || '[]');
+    if (favs.some(fav => fav._id === product._id)) {
+      favs = favs.filter(fav => fav._id !== product._id);
+      showNotification(`${product.name} removed from favourites`);
+    } else {
+      favs.push({
+        _id: product._id,
+        name: product.name,
+        image: product.image,
+        selectedQuantity: product.selectedQuantity,
+        prices: product.prices
+      });
+      showNotification(`${product.name} added to favourites`);
+    }
+    localStorage.setItem('favourites', JSON.stringify(favs));
+    setFavourites(favs);
   };
 
   const addToCart = async (product) => {
@@ -131,7 +156,7 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
             key={notification.id}
             className="mb-2 animate-float-up"
             style={{
-              animation: 'floatUp 3s ease-out forwards',
+              animation: "floatUp 3s ease-out forwards",
             }}
           >
             <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 min-w-[250px]">
@@ -159,102 +184,130 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="w-full bg-white/70 shadow-sm">
+        <div className="max-w-screen-xl mx-auto flex items-center px-4 py-3 sm:py-5">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search products..."
+            className="border rounded px-3 py-2 w-full max-w-md text-sm focus:outline-none focus:ring focus:border-blue-400"
+            style={{ marginRight: "1rem" }}
+          />
+        </div>
+      </div>
+
       {/* Product Grid */}
       <div className="px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {products.map((p) => {
-            const server = BASE_API_URL;
-            let imgPath = p.image || "";
-            let src = imgPath.startsWith("http")
-              ? imgPath
-              : `${server}${imgPath}`;
+          {products
+            .filter((p) =>
+              p.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((p) => {
+              const server = BASE_API_URL;
+              let imgPath = p.image || "";
+              let src = imgPath.startsWith("http")
+                ? imgPath
+                : `${server}${imgPath}`;
 
-            const itemKey = `${p._id}-${p.selectedQuantity}`;
-            const isAdded = addedToCart[itemKey];
+              const itemKey = `${p._id}-${p.selectedQuantity}`;
+              const isAdded = addedToCart[itemKey];
 
-            return (
-              <div
-                key={p._id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col"
-              >
-                {/* Image Container */}
-                <div className="relative w-full aspect-square bg-gray-100">
-                  <img
-                    src={src}
-                    alt={p.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
-                    }}
-                  />
-                </div>
+              return (
+                <div
+                  key={p._id}
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col"
+                >
+                  {/* Image Container */}
+                  <div className="relative w-full aspect-square bg-gray-100">
+                    <img
+                      src={src}
+                      alt={p.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src =
+                          "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                      }}
+                    />
+                    {/* Heart Icon */}
+                    <button
+                      type="button"
+                      onClick={() => toggleFavourite(p)}
+                      className="absolute top-2 right-2 text-xl focus:outline-none"
+                      style={{ color: favourites.some(fav => fav._id === p._id) ? '#e0245e' : '#ccc' }}
+                      aria-label={favourites.some(fav => fav._id === p._id) ? 'Remove from favourites' : 'Add to favourites'}
+                    >
+                      <FaHeart />
+                    </button>
+                  </div>
 
-                {/* Product Details */}
-                <div className="p-3 flex flex-col flex-grow">
-                  <h3 className="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 h-10">
-                    {p.name}
-                  </h3>
+                  {/* Product Details */}
+                  <div className="p-3 flex flex-col flex-grow">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 h-10">
+                      {p.name}
+                    </h3>
 
-                  {/* Quantity Selector */}
-                  {p.prices && (
-                    <div className="mt-auto">
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Quantity
-                      </label>
-                      <select
-                        className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        value={p.selectedQuantity}
-                        onChange={(e) =>
-                          handleQuantityChange(p._id, e.target.value)
-                        }
-                      >
-                        {Object.keys(p.prices).map((q) => (
-                          <option key={q} value={q}>
-                            {q}
-                          </option>
-                        ))}
-                      </select>
-
-                      {/* Price and Add to Cart Button */}
-                      <div className="mt-2 flex items-center justify-between gap-2">
-                        <p className="text-base font-bold text-green-600">
-                          ₹{p.prices[p.selectedQuantity]}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            addToCart(p);
-                          }}
-                          disabled={isAdded}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm font-semibold transition-all ${
-                            isAdded
-                              ? "bg-green-500 text-white"
-                              : "bg-blue-600 hover:bg-blue-700 text-white"
-                          }`}
+                    {/* Quantity Selector */}
+                    {p.prices && (
+                      <div className="mt-auto">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Quantity
+                        </label>
+                        <select
+                          className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          value={p.selectedQuantity}
+                          onChange={(e) =>
+                            handleQuantityChange(p._id, e.target.value)
+                          }
                         >
-                          {isAdded ? (
-                            <>
-                              <Check size={14} />
-                              <span>Added</span>
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingCart size={14} />
-                              <span>Add</span>
-                            </>
-                          )}
-                        </button>
+                          {Object.keys(p.prices).map((q) => (
+                            <option key={q} value={q}>
+                              {q}
+                            </option>
+                          ))}
+                        </select>
+
+                        {/* Price and Add to Cart Button */}
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <p className="text-base font-bold text-green-600">
+                            ₹{p.prices[p.selectedQuantity]}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addToCart(p);
+                            }}
+                            disabled={isAdded}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm font-semibold transition-all ${
+                              isAdded
+                                ? "bg-green-500 text-white"
+                                : "bg-blue-600 hover:bg-blue-700 text-white"
+                            }`}
+                          >
+                            {isAdded ? (
+                              <>
+                                <Check size={14} />
+                                <span>Added</span>
+                              </>
+                            ) : (
+                              <>
+                                <ShoppingCart size={14} />
+                                <span>Add</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </div>
     </div>
