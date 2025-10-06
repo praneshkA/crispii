@@ -8,52 +8,30 @@ const MyOrders = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [error, setError] = useState('');
-  const [debugInfo, setDebugInfo] = useState(null);
-
-  // Track userId from sessionStorage so we refetch when user logs in/out
-  const [authUserId, setAuthUserId] = React.useState(() => sessionStorage.getItem('userId'));
 
   useEffect(() => {
     fetchOrders();
-
-    // Listen for storage changes (other tabs) to refresh orders when userId changes
-    const onStorage = (e) => {
-      if (e.key === 'userId') {
-        setAuthUserId(e.newValue);
-      }
-    };
-  window.addEventListener('storage', onStorage);
-  return () => window.removeEventListener('storage', onStorage);
-  }, [authUserId]);
+  }, []);
 
   const fetchOrders = async () => {
     try {
       // Get userId from sessionStorage (from login)
       const userId = sessionStorage.getItem('userId');
-
+      
       if (!userId) {
         setError('Please login to view your orders');
-        setOrders([]);
         setLoading(false);
         return;
       }
-
-      const url = `${BASE_API_URL}/api/orders/user/${userId}`;
-      setDebugInfo({ url, status: 'pending' });
-      const response = await axios.get(url);
-
-      setDebugInfo({ url, status: response.status, data: response.data });
-
-      if (response.data && response.data.success) {
-        setOrders(response.data.orders || []);
-      } else {
-        setOrders([]);
-        setError((response.data && response.data.message) || 'Failed to load orders');
+      
+  const response = await axios.get(`${BASE_API_URL}/api/orders/user/${userId}`);
+      
+      if (response.data.success) {
+        setOrders(response.data.orders);
       }
     } catch (err) {
       console.error('Error fetching orders:', err);
       setError('Failed to load orders');
-      setDebugInfo({ error: err && err.response ? err.response.data : err.message || String(err) });
     } finally {
       setLoading(false);
     }
@@ -145,46 +123,41 @@ const MyOrders = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">My Orders</h1>
           <p className="text-gray-600">Track and manage your orders</p>
-          {debugInfo && (
-            <pre className="text-xs text-left bg-gray-100 p-2 mt-3 rounded text-gray-700 max-w-3xl mx-auto overflow-auto">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          )}
         </div>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <Package className="w-20 h-20 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
-            <p className="text-gray-600 mb-6">You haven't placed any orders yet.</p>
+          <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 text-center max-w-md mx-auto">
+            <Package className="w-16 sm:w-20 h-16 sm:h-20 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
+            <p className="text-sm sm:text-base text-gray-600 mb-6">You haven't placed any orders yet.</p>
             <button
               onClick={() => window.location.href = '/'}
-              className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold hover:bg-blue-700 transition"
             >
               Start Shopping
             </button>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Orders List */}
-            <div className="lg:col-span-1 space-y-4">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Order History</h2>
+            <div className="lg:col-span-1 space-y-3 sm:space-y-4">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">Order History</h2>
               {orders.map((order) => (
                 <div
                   key={order.orderId}
                   onClick={() => setSelectedOrder(order)}
-                  className={`bg-white rounded-xl shadow-md p-4 cursor-pointer transition hover:shadow-xl ${
+                  className={`bg-white rounded-xl shadow-md p-3 sm:p-4 cursor-pointer transition hover:shadow-xl ${
                     selectedOrder?.orderId === order.orderId ? 'ring-2 ring-blue-500' : ''
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-gray-800">#{order.orderId}</h3>
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <h3 className="font-bold text-sm sm:text-base text-gray-800 truncate mr-2">#{order.orderId}</h3>
                     {getStatusIcon(order.orderStatus)}
                   </div>
-                  <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
+                  <div className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
                     {getStatusLabel(order.orderStatus)}
                   </div>
-                  <div className="mt-3 text-sm text-gray-600">
+                  <div className="mt-2 sm:mt-3 text-sm text-gray-600">
                     <p className="font-semibold text-gray-800">₹{order.totalAmount}</p>
                     <p className="text-xs mt-1">{new Date(order.createdAt).toLocaleDateString('en-IN', {
                       day: 'numeric',
@@ -199,12 +172,12 @@ const MyOrders = () => {
             {/* Order Details */}
             {selectedOrder ? (
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8">
                   {/* Order Header */}
-                  <div className="border-b pb-6 mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-bold text-gray-800">Order #{selectedOrder.orderId}</h2>
-                      <div className={`px-4 py-2 rounded-full text-sm font-semibold border ${getStatusColor(selectedOrder.orderStatus)}`}>
+                  <div className="border-b pb-4 sm:pb-6 mb-4 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 break-all">Order #{selectedOrder.orderId}</h2>
+                      <div className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold border ${getStatusColor(selectedOrder.orderStatus)} w-fit`}>
                         {getStatusLabel(selectedOrder.orderStatus)}
                       </div>
                     </div>
@@ -218,7 +191,7 @@ const MyOrders = () => {
                             style={{ width: `${getOrderProgress(selectedOrder.orderStatus)}%` }}
                           ></div>
                         </div>
-                        <div className="flex justify-between mt-2 text-xs text-gray-600">
+                        <div className="flex justify-between mt-2 text-[10px] sm:text-xs text-gray-600">
                           <span>Pending</span>
                           <span>Processing</span>
                           <span>Shipped</span>
@@ -229,12 +202,12 @@ const MyOrders = () => {
                   </div>
 
                   {/* Customer Details */}
-                  <div className="mb-6">
-                    <h3 className="font-bold text-gray-800 mb-4 flex items-center">
-                      <User className="w-5 h-5 mr-2" />
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-800 mb-3 sm:mb-4 flex items-center">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Shipping Details
                     </h3>
-                    <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
+                    <div className="bg-gray-50 rounded-xl p-3 sm:p-4 space-y-2 text-xs sm:text-sm">
                       <p className="font-semibold text-gray-800">
                         {selectedOrder.customerDetails.firstName} {selectedOrder.customerDetails.lastName}
                       </p>
@@ -255,44 +228,44 @@ const MyOrders = () => {
                   </div>
 
                   {/* Products */}
-                  <div className="mb-6">
-                    <h3 className="font-bold text-gray-800 mb-4 flex items-center">
-                      <Package className="w-5 h-5 mr-2" />
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-800 mb-3 sm:mb-4 flex items-center">
+                      <Package className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Order Items
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {selectedOrder.items.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center gap-4">
+                        <div key={index} className="flex items-center justify-between bg-gray-50 rounded-xl p-3 sm:p-4 gap-2">
+                          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                             {item.image && (
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="w-16 h-16 object-cover rounded-lg"
+                                className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
                               />
                             )}
-                            <div>
-                              <p className="font-semibold text-gray-800">{item.name}</p>
-                              <p className="text-sm text-gray-600">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-sm sm:text-base text-gray-800 truncate">{item.name}</p>
+                              <p className="text-xs sm:text-sm text-gray-600">
                                 {item.selectedQuantity} × {item.quantity}
                               </p>
                             </div>
                           </div>
-                          <p className="font-bold text-gray-800">₹{item.price * item.quantity}</p>
+                          <p className="font-bold text-sm sm:text-base text-gray-800 flex-shrink-0">₹{item.price * item.quantity}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Payment Details */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-bold text-gray-800 mb-4">Payment Information</h3>
-                    <div className="bg-blue-50 rounded-xl p-4 space-y-2">
-                      <div className="flex justify-between text-sm">
+                  <div className="border-t pt-4 sm:pt-6">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-800 mb-3 sm:mb-4">Payment Information</h3>
+                    <div className="bg-blue-50 rounded-xl p-3 sm:p-4 space-y-2">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Payment Status:</span>
                         <span className="font-semibold text-gray-800">{selectedOrder.paymentStatus}</span>
                       </div>
-                      <div className="flex justify-between text-lg font-bold pt-2 border-t border-blue-200">
+                      <div className="flex justify-between text-base sm:text-lg font-bold pt-2 border-t border-blue-200">
                         <span>Total Amount:</span>
                         <span className="text-blue-600">₹{selectedOrder.totalAmount}</span>
                       </div>
@@ -300,23 +273,23 @@ const MyOrders = () => {
                   </div>
 
                   {/* Timestamps */}
-                  <div className="mt-6 pt-6 border-t text-sm text-gray-600">
-                    <div className="flex justify-between">
+                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t text-xs sm:text-sm text-gray-600">
+                    <div className="flex justify-between gap-2">
                       <span>Order Placed:</span>
-                      <span className="font-semibold">{new Date(selectedOrder.createdAt).toLocaleString('en-IN')}</span>
+                      <span className="font-semibold text-right">{new Date(selectedOrder.createdAt).toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="flex justify-between mt-2">
+                    <div className="flex justify-between gap-2 mt-2">
                       <span>Last Updated:</span>
-                      <span className="font-semibold">{new Date(selectedOrder.updatedAt || selectedOrder.createdAt).toLocaleString('en-IN')}</span>
+                      <span className="font-semibold text-right">{new Date(selectedOrder.updatedAt || selectedOrder.createdAt).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="lg:col-span-2 flex items-center justify-center">
+              <div className="lg:col-span-2 flex items-center justify-center py-12">
                 <div className="text-center text-gray-500">
-                  <Package className="w-20 h-20 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">Select an order to view details</p>
+                  <Package className="w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-4 opacity-50" />
+                  <p className="text-base sm:text-lg">Select an order to view details</p>
                 </div>
               </div>
             )}

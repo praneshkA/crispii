@@ -188,7 +188,7 @@ function App() {
         <Route path="/return-exchange" element={<ReturnExchange />} />
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/my-order" element={<MyOrder />} />
+        <Route path="/myorders" element={<MyOrder />} />
         <Route path="/login" element={<LoginSignup onAuthSuccess={handleAuth} />} />
         <Route path="/checkout" element={<Checkout cartItems={cartItems} />} />
         <Route path="/payment" element={<Payment />} />

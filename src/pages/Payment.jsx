@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { CheckCircle, Upload, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import qrcode from "../assets/qrcode.jpg";
+import { BASE_API_URL } from "../config";
 
 const Payment = () => {
   const location = useLocation();
@@ -88,7 +89,7 @@ const Payment = () => {
       formDataObj.append('paymentScreenshot', file);
 
       // Send to backend
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${BASE_API_URL}/api/orders`, {
         method: "POST",
         body: formDataObj, // Don't set Content-Type header - browser will set it automatically with boundary
       });
