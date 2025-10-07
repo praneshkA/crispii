@@ -49,163 +49,163 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
 
   return (
     <nav className="bg-gradient-to-br from-pink-700 to-blue-800 w-full sticky top-0 z-50 shadow-md">
-      <div className="max-w-6xl mx-auto px-4 h-20">
-        <div className="grid grid-cols-3 items-center h-full">
-          {/* Left: Hamburger + Mobile favourites (Mobile) / Desktop Links (Desktop) */}
-          <div className="flex items-center justify-start md:-ml-6">
-            {/* Hamburger (mobile only) */}
-            <button
-              className="text-white md:hidden text-2xl mr-4 hover:scale-110 transition-transform duration-200"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              {menuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-
-            {/* Mobile: favourites on the left (hidden on md+) */}
-            <div className="md:hidden">
-              <Link to="/favourites" className="relative text-pink-500 text-2xl mx-2" aria-label="Favourites">
-                <FaHeart />
-                {favouriteCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                    {favouriteCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-
-            {/* Desktop Links */}
-<div className="hidden md:flex space-x-5 items-center absolute left-8 top-1/2 -translate-y-1/2">
-    <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
-      Home
-    </Link>
-    <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
-      My Orders
-    </Link>
-    <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
-      Contact Us
-    </Link>
-    {auth && auth.userId && auth.userId !== "guest" ? (
-      <button
-        onClick={() => onLogout && onLogout()}
-        className="text-white font-semibold hover:text-blue-400 transition"
-      >
-        Logout
-      </button>
-    ) : (
-      <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
-        Login/Signup
-      </Link>
-    )}
-  </div>
-
-          </div>
-
-          {/* Center: Logo */}
-          <div className="flex justify-center">
-            <Link to="/">
-              <img src={logogif} alt="Logo" className="h-20" />
+  <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-20 relative">
+        {/* Left: Hamburger + Favourites (mobile only) */}
+  <div className="flex items-center space-x-3 md:space-x-6">
+          {/* Hamburger (mobile) */}
+          <button
+            className="text-white md:hidden text-2xl mr-6 hover:scale-110 transition-transform duration-200"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+          {/* Favourites icon on left in mobile, hidden in desktop */}
+          <Link to="/favourites" className="relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200 mx-2 md:hidden" aria-label="Favourites">
+            <FaHeart />
+            {favouriteCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-md ">
+                {favouriteCount}
+              </span>
+            )}
+          </Link>
+          {/* Desktop Links */}
+          <div className="hidden md:flex space-x-6 items-center">
+            <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
+              Home
             </Link>
-          </div>
-
-          {/* Right: Search (button), Favourites (desktop), Cart */}
-          <div className="flex items-center  gap-7 justify-end">
-            {/* Search Icon triggers modal (visible on all sizes, placed on the right) */}
-            <button
-              className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-            >
-              <FaSearch />
-            </button>
-
-            {/* Heart Icon for favourites (desktop only) */}
-            <Link to="/favourites" className="hidden md:inline-flex relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200" aria-label="Favourites">
-              <FaHeart />
-              {favouriteCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {favouriteCount}
-                </span>
-              )}
+            <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
+              My Orders
             </Link>
-
-            {/* Cart Icon */}
-            <Link to="/cart" className="relative text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200">
-              <FaShoppingCart />
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {cartCount}
-                </span>
-              )}
+            <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
+              Contact Us
             </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Modal Search Bar */}
-      {searchOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setSearchOpen(false)}
-          />
-          {/* Modal */}
-          <div className="relative bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6 z-[101] flex flex-col">
-            <button
-              className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl"
-              onClick={() => setSearchOpen(false)}
-              aria-label="Close"
-            >
-              <FaTimes />
-            </button>
-            <h2 className="text-lg font-bold mb-4 text-center text-gray-800">Search Products</h2>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Type to search..."
-              className="border rounded px-3 py-2 w-full text-sm focus:outline-none focus:ring focus:border-blue-400 mb-4"
-              autoFocus
-            />
-            {loading ? (
-              <div className="flex items-center justify-center py-6">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-              </div>
+            {auth && auth.userId && auth.userId !== "guest" ? (
+              <button
+                onClick={() => onLogout && onLogout()}
+                className="text-white font-semibold hover:text-blue-400 transition"
+              >
+                Logout
+              </button>
             ) : (
-              <div className="max-h-64 overflow-y-auto">
-                {products.length === 0 ? (
-                  <div className="text-gray-500 text-center py-6">No products found</div>
-                ) : (
-                  products
-                    .filter((p) =>
-                      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .slice(0, 10)
-                    .map((p) => (
-                      <Link
-                        key={p._id}
-                        to="/products"
-                        onClick={() => setSearchOpen(false)}
-                        className="px-3 py-2 rounded hover:bg-blue-100 transition flex items-center gap-3"
-                      >
-                        <img
-                          src={p.image && p.image.startsWith("http") ? p.image : `${BASE_API_URL}${p.image}`}
-                          alt={p.name}
-                          className="w-10 h-10 object-cover rounded"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
-                          }}
-                        />
-                        <span className="font-medium text-gray-800">{p.name}</span>
-                      </Link>
-                    ))
-                )}
-              </div>
+              <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
+                Login/Signup
+              </Link>
             )}
           </div>
         </div>
-      )}
+
+        {/* Center: Logo */}
+
+        {/* Center: Logo absolutely centered in header */}
+        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+          <Link to="/">
+            <img src={logogif} alt="Logo" className="h-20 mx-auto" />
+          </Link>
+        </div>
+
+        {/* Right: Cart, Search (desktop), Favourites (desktop) */}
+        <div className="flex items-center gap-6 relative">
+          {/* Favourites icon on right in desktop, hidden in mobile */}
+          <Link to="/favourites" className="relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200 mx-2 hidden md:inline-flex" aria-label="Favourites">
+            <FaHeart />
+            {favouriteCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-md  ">
+                {favouriteCount}
+              </span>
+            )}
+          </Link>
+          {/* Search icon always on right, but only visible in desktop */}
+          <button
+            className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none hidden md:inline-flex"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+          >
+            <FaSearch />
+          </button>
+          {/* Search icon on right in mobile, visible only in mobile */}
+          <button
+            className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none md:hidden"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+          >
+            <FaSearch />
+          </button>
+          {/* Cart Icon */}
+          <Link to="/cart" className="relative text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200">
+            <FaShoppingCart />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+          {/* Modal Search Bar */}
+          {searchOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center">
+              {/* Overlay */}
+              <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                onClick={() => setSearchOpen(false)}
+              />
+              {/* Modal */}
+              <div className="relative bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6 z-[101] flex flex-col">
+                <button
+                  className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl"
+                  onClick={() => setSearchOpen(false)}
+                  aria-label="Close"
+                >
+                  <FaTimes />
+                </button>
+                <h2 className="text-lg font-bold mb-4 text-center text-gray-800">Search Products</h2>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Type to search..."
+                  className="border rounded px-3 py-2 w-full text-sm focus:outline-none focus:ring focus:border-blue-400 mb-4"
+                  autoFocus
+                />
+                {loading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto">
+                    {products.length === 0 ? (
+                      <div className="text-gray-500 text-center py-6">No products found</div>
+                    ) : (
+                      products
+                        .filter((p) =>
+                          p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                        )
+                        .slice(0, 10)
+                        .map((p) => (
+                          <Link
+                            key={p._id}
+                            to="/products"
+                            onClick={() => setSearchOpen(false)}
+                            className="block px-3 py-2 rounded hover:bg-blue-100 transition flex items-center gap-3"
+                          >
+                            <img
+                              src={p.image && p.image.startsWith("http") ? p.image : `${BASE_API_URL}${p.image}`}
+                              alt={p.name}
+                              className="w-10 h-10 object-cover rounded"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                              }}
+                            />
+                            <span className="font-medium text-gray-800">{p.name}</span>
+                          </Link>
+                        ))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Mobile Menu */}
       <div
@@ -223,7 +223,7 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
         </div>
 
         {/* Menu Links with staggered animation */}
-        <div className="flex flex-col mt-8 space-y-6 px-6">
+        <div className="flex flex-col mt-8 space-y-6  px-6">
           <Link 
             to="/" 
             className={`text-lg font-semibold hover:text-blue-300 hover:translate-x-2 transition-all duration-300 transform
@@ -316,3 +316,4 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
 }
 
 export default Navbar;
+

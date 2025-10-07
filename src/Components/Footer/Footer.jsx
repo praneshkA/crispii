@@ -5,7 +5,7 @@ import { motion as Motion } from "framer-motion";
 const Footer = () => {
   return (
     <Motion.footer
-      className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-700 text-white"
+      className="bg-gradient-to-r from-pink-700  to-blue-800 text-white"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
