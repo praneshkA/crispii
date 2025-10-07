@@ -25,11 +25,10 @@ const ReturnExchange = () => {
       <p className="text-lg mb-4 text-gray-700 leading-relaxed">
         You can reach us at{" "}
         <a
-          href="mailto:crispii_snacks@yahoo.com"
+          href="mailto:support@crispii.live"
           className="underline text-blue-600 hover:text-blue-800"
         >
-          crispii_snacks@yahoo.com
-        </a>{" "}
+support@crispii.live        </a>{" "}
         or call us at{" "}
         <span className="font-semibold">8248928998 / 9976121007</span> for
         assistance.
