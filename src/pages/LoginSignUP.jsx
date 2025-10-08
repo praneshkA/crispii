@@ -5,15 +5,16 @@ import { BASE_API_URL } from '../config';
 
 const LoginSignup = ({ onAuthSuccess }) => {
   const [isLogin, setIsLogin] = useState(false);
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState('');
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ username: '', email: '', password: '' });
+    setFormData({ username: '', email: '', password: '', confirmPassword: '' });
     setErrors({});
     setServerError('');
   };
@@ -38,6 +39,15 @@ const LoginSignup = ({ onAuthSuccess }) => {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    // Confirm password check only for signup
+    if (!isLogin) {
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = 'Please confirm your password';
+      } else if (formData.confirmPassword !== formData.password) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
     }
 
     setErrors(newErrors);
@@ -217,6 +227,39 @@ const LoginSignup = ({ onAuthSuccess }) => {
                 <p className="text-red-300 text-xs mt-1 ml-1">{errors.password}</p>
               )}
             </div>
+
+            {/* Confirm Password - only for signup */}
+            {!isLogin && (
+              <div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-black/90 pointer-events-none" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    placeholder="Confirm Password"
+                    className={`w-full bg-white/80 border ${
+                      errors.confirmPassword ? 'border-red-400' : 'border-white/20'
+                    } rounded-lg py-2.5 sm:py-3 pl-9 sm:pl-10 pr-10 sm:pr-12 text-sm sm:text-base text-black placeholder-black/80 focus:outline-none focus:ring-2 focus:ring-black/90 focus:border-transparent transition-all`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black/80 hover:text-white transition-colors touch-manipulation"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ) : (
+                      <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-red-300 text-xs mt-1 ml-1">{errors.confirmPassword}</p>
+                )}
+              </div>
+            )}
 
             <button
               type="submit"

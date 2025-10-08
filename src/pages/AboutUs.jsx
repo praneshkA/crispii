@@ -1,3 +1,4 @@
+//about us
 import React from "react";
 
 const AboutUs = () => {
@@ -9,6 +10,12 @@ const AboutUs = () => {
       </p>
       <p className="text-lg mb-2">
         Founded in 2025, we are committed to delivering fresh, high-quality snacks made from traditional recipes with a modern touch.
+      </p>
+      <p className="text-lg mb-2">
+        We source bulk snacks directly from a reputed company and offer them to you at affordable prices. Acting as distributors, we make it easy for you to enjoy a wide variety of snacks without breaking the bank.
+      </p>
+      <p className="text-lg mb-2">
+        <strong>FSSAI License Number:</strong> 1242502800327
       </p>
       <p className="text-lg gap-2">
         Our mission is to bring joy to snack lovers everywhere by offering delicious treats crafted with care and packed with flavor.

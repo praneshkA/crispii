@@ -4,15 +4,17 @@ import { BASE_API_URL } from "../config";
 import { Package, ShoppingCart, Check } from "lucide-react";
 import { FaHeart } from "react-icons/fa";
 import BackToHome from "./BackToHome/BackToHome";
+import { useNavigate } from "react-router-dom";
 
 const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState({});
   const [notifications, setNotifications] = useState([]);
+  const [loginRedirect, setLoginRedirect] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [favourites, setFavourites] = useState([]);
-  // userId is already provided as a prop
+  const navigate = useNavigate();
 
   const fetchFavourites = async () => {
     const favs = JSON.parse(localStorage.getItem('favourites') || '[]');
@@ -84,6 +86,11 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
   };
 
   const addToCart = async (product) => {
+    // If user is not logged in, show full-screen friendly message then redirect to login
+    if (!userId || userId === "guest") {
+      setLoginRedirect(true);
+      return;
+    }
     try {
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
         method: "POST",
@@ -130,6 +137,15 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
     }
   };
 
+  // when loginRedirect becomes true, navigate to the login page after a short delay
+  useEffect(() => {
+    if (!loginRedirect) return;
+    const timer = setTimeout(() => {
+      navigate("/login", { state: { from: window.location.pathname } });
+    }, 1500); // 1.5s so user can read the message
+    return () => clearTimeout(timer);
+  }, [loginRedirect, navigate]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -143,6 +159,18 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
       <div className="flex flex-col items-center justify-center min-h-screen text-gray-500 px-4">
         <Package size={48} className="mb-3" />
         <p className="text-lg font-semibold">No products found</p>
+      </div>
+    );
+  }
+
+  // Show a short, catchy full-screen message and redirect when user is not signed in (like MyOrder)
+  if (loginRedirect) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Almost there!</h2>
+          <p className="text-gray-600 mb-6">Hang on! Your snack cart is warming up let’s get you signed in 🍪</p>
+        </div>
       </div>
     );
   }

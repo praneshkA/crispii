@@ -8,6 +8,8 @@ const MyOrders = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [error, setError] = useState('');
+  // new: show a short message then redirect to login
+  const [loginRedirect, setLoginRedirect] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -19,8 +21,9 @@ const MyOrders = () => {
       const userId = sessionStorage.getItem('userId');
       
       if (!userId) {
-        setError('Please login to view your orders');
+        // show a friendly message and redirect to login
         setLoading(false);
+        setLoginRedirect(true);
         return;
       }
       
@@ -36,6 +39,15 @@ const MyOrders = () => {
       setLoading(false);
     }
   };
+
+  // when loginRedirect becomes true, navigate to the login page after a short delay
+  useEffect(() => {
+    if (!loginRedirect) return;
+    const timer = setTimeout(() => {
+      window.location.href = '/login';
+    }, 1500); // 1.5s to let the user read the catchy message
+    return () => clearTimeout(timer);
+  }, [loginRedirect]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -91,6 +103,18 @@ const MyOrders = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 font-semibold">Loading your orders...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show a short, catchy message and redirect when user is not signed in
+  if (loginRedirect) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Almost there!</h2>
+          <p className="text-gray-600 mb-6">Hang on! Your snack cart is warming up  let’s get you signed in 🍪</p>
         </div>
       </div>
     );

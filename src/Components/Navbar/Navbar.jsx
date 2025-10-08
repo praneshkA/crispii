@@ -49,18 +49,45 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
 
   return (
     <nav className="bg-gradient-to-br from-pink-700 to-blue-800 w-full sticky top-0 z-50 shadow-md">
-  <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-20 relative">
+      <div className="relative w-full h-20 flex items-center">
+        {/* Desktop menu container - absolutely positioned at left edge */}
+        <div className="hidden md:flex md:absolute md:left-0 md:top-1/2 md:-translate-y-1/2 z-20 space-x-6 items-center md:pl-6">
+          <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
+            Home
+          </Link>
+          <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
+            My Orders
+          </Link>
+          <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
+            Contact Us
+          </Link>
+          {auth && auth.userId && auth.userId !== "guest" ? (
+            <button
+              onClick={() => onLogout && onLogout()}
+              className="text-white font-semibold hover:text-blue-400 transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
+              Login/Signup
+            </Link>
+          )}
+        </div>
+        
+        {/* Main centered container for mobile and logo */}
+        <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-20 relative w-full">
         {/* Left: Hamburger + Favourites (mobile only) */}
-  <div className="flex items-center space-x-3 md:space-x-6">
+        <div className="flex items-center space-x-3 md:hidden">
           {/* Hamburger (mobile) */}
           <button
-            className="text-white md:hidden text-2xl mr-6 hover:scale-110 transition-transform duration-200"
+            className="text-white text-2xl mr-6 hover:scale-110 transition-transform duration-200"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
-          {/* Favourites icon on left in mobile, hidden in desktop */}
-          <Link to="/favourites" className="relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200 mx-2 md:hidden" aria-label="Favourites">
+          {/* Favourites icon on left in mobile */}
+          <Link to="/favourites" className="relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200 mx-2" aria-label="Favourites">
             <FaHeart />
             {favouriteCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-md ">
@@ -68,33 +95,7 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
               </span>
             )}
           </Link>
-          {/* Desktop Links */}
-          <div className="hidden md:flex space-x-6 items-center">
-            <Link to="/" className="text-white font-semibold hover:text-blue-400 transition">
-              Home
-            </Link>
-            <Link to="/myorders" className="text-white font-semibold hover:text-blue-400 transition">
-              My Orders
-            </Link>
-            <Link to="/contact" className="text-white font-semibold hover:text-blue-400 transition">
-              Contact Us
-            </Link>
-            {auth && auth.userId && auth.userId !== "guest" ? (
-              <button
-                onClick={() => onLogout && onLogout()}
-                className="text-white font-semibold hover:text-blue-400 transition"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link to="/login" className="text-white font-semibold hover:text-blue-400 transition">
-                Login/Signup
-              </Link>
-            )}
-          </div>
         </div>
-
-        {/* Center: Logo */}
 
         {/* Center: Logo absolutely centered in header */}
         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
@@ -103,10 +104,10 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
           </Link>
         </div>
 
-        {/* Right: Cart, Search (desktop), Favourites (desktop) */}
-        <div className="flex items-center gap-6 relative">
-          {/* Favourites icon on right in desktop, hidden in mobile */}
-          <Link to="/favourites" className="relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200 mx-2 hidden md:inline-flex" aria-label="Favourites">
+        {/* Right: Cart, Search (desktop), Favourites (desktop) - absolutely positioned at right edge */}
+        <div className="hidden md:flex md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 z-20 items-center gap-6">
+          {/* Favourites icon on right in desktop */}
+          <Link to="/favourites" className="relative text-pink-500 text-2xl hover:text-pink-600 hover:scale-110 transition-all duration-200" aria-label="Favourites">
             <FaHeart />
             {favouriteCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-md  ">
@@ -114,23 +115,34 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
               </span>
             )}
           </Link>
-          {/* Search icon always on right, but only visible in desktop */}
+          {/* Search icon */}
           <button
-            className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none hidden md:inline-flex"
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-          >
-            <FaSearch />
-          </button>
-          {/* Search icon on right in mobile, visible only in mobile */}
-          <button
-            className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none md:hidden"
+            className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none"
             onClick={() => setSearchOpen(true)}
             aria-label="Search"
           >
             <FaSearch />
           </button>
           {/* Cart Icon */}
+          <Link to="/cart" className="relative text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200">
+            <FaShoppingCart />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+        </div>
+
+        {/* Right side for mobile: Search and Cart */}
+        <div className="flex md:hidden items-center gap-6 relative">
+          <button
+            className="text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200 focus:outline-none"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+          >
+            <FaSearch />
+          </button>
           <Link to="/cart" className="relative text-white text-2xl hover:text-blue-400 hover:scale-110 transition-all duration-200">
             <FaShoppingCart />
             {cartCount > 0 && (
@@ -204,6 +216,7 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
 
@@ -316,4 +329,3 @@ const Navbar = ({ cartCount = 0, auth = null, onLogout, menuOpen, setMenuOpen })
 }
 
 export default Navbar;
-
