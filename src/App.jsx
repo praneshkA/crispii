@@ -28,12 +28,14 @@ import ScrollingBanner from "./Components/ScrollingBanner/ScrollingBanner.jsx";
 import WhatsAppButton from "./Components/WhatsAppButton/WhatsAppButton.jsx";
 
 // Home page content
-const HomePage = () => (
+const HomePage = ({ onCartUpdate }) => (
   <>
     <ScrollingBanner />
     <Popular />
     <Hero />
-    <Offers />
+    {/* Combo showcase embedded under Hero */}
+    
+    <Offers onCartUpdate={onCartUpdate} />
     <WhatsAppButton />
   </>
 );
@@ -176,7 +178,7 @@ function App() {
         setMenuOpen={setMenuOpen}
       />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+    <Route path="/" element={<HomePage onCartUpdate={handleCartUpdate} />} />
         <Route path="/products" element={<AllProductsPage />} />
         <Route path="/chips" element={<ChipsPage />} />
         <Route path="/cookies" element={<CookiesPage />} />

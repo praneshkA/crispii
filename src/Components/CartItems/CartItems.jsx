@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
   const navigate = useNavigate();
+  const [showCrackers, setShowCrackers] = React.useState(false);
 
   // If user is not logged in, redirect to login page
   React.useEffect(() => {
@@ -15,6 +16,15 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
       navigate('/login', { state: { from: '/cart' } });
     }
   }, [navigate, userId]);
+
+  // Trigger crackers animation when cart has items
+  React.useEffect(() => {
+    if (cartItems.length > 0) {
+      setShowCrackers(true);
+      const timer = setTimeout(() => setShowCrackers(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
@@ -45,7 +55,58 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
   }
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen pb-6">
+    <div className="w-full bg-gray-50 min-h-screen pb-6 relative">
+      {/* Crackers Animation */}
+      {showCrackers && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {/* Confetti particles */}
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: '-10px',
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                backgroundColor: ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d96ff', '#ff69eb'][Math.floor(Math.random() * 5)],
+                borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                animationDelay: `${Math.random() * 0.5}s`,
+                animationDuration: `${Math.random() * 2 + 2}s`,
+                transform: `rotate(${Math.random() * 360}deg)`
+              }}
+            />
+          ))}
+          
+          {/* Sparkles */}
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={`sparkle-${i}`}
+              className="absolute animate-sparkle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 50}%`,
+                fontSize: `${Math.random() * 20 + 15}px`,
+                animationDelay: `${Math.random() * 1}s`,
+                animationDuration: `${Math.random() * 1 + 1}s`
+              }}
+            >
+              ✨
+            </div>
+          ))}
+
+          {/* Celebration text */}
+          <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-bounce-in text-center">
+            <div className="text-4xl font-bold text-yellow-500 drop-shadow-lg">
+              🎉 Yay! 🎉
+            </div>
+            <div className="text-xl font-semibold text-gray-700 mt-2">
+              Your cart is ready!
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white shadow-sm mb-4 sticky top-0 z-10">
         <div className="px-4 py-4">
@@ -146,6 +207,56 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes confetti {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes sparkle {
+          0%, 100% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.5);
+          }
+        }
+
+        @keyframes bounce-in {
+          0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.2);
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+          }
+        }
+
+        .animate-confetti {
+          animation: confetti linear forwards;
+        }
+
+        .animate-sparkle {
+          animation: sparkle ease-in-out infinite;
+        }
+
+        .animate-bounce-in {
+          animation: bounce-in 0.6s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

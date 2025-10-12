@@ -1,20 +1,23 @@
 //ProductList.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BASE_API_URL } from "../config";
+import mixtureImg from '../assets/mixture.jpeg';
+
+import nendramImg from '../assets/banana.jpg';
 import { Package, ShoppingCart, Check } from "lucide-react";
 import { FaHeart } from "react-icons/fa";
 import BackToHome from "./BackToHome/BackToHome";
-import { useNavigate } from "react-router-dom";
 
 const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [addedToCart, setAddedToCart] = useState({});
+  const [addedToCart, _setAddedToCart] = useState({});
   const [notifications, setNotifications] = useState([]);
-  const [loginRedirect, setLoginRedirect] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [favourites, setFavourites] = useState([]);
-  const navigate = useNavigate();
+  // userId is already provided as a prop
 
   const fetchFavourites = async () => {
     const favs = JSON.parse(localStorage.getItem('favourites') || '[]');
@@ -40,7 +43,32 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
           return { ...p, selectedQuantity: firstKey };
         });
 
-        setProducts(updated);
+        // Only add combo products if not in a category (main page)
+        if (!category) {
+          const comboProducts = [
+            {
+              _id: 'combo-family',
+              name: '🎁 Crispii Family Combo',
+              description: 'Mixture, Murukku, Potato Chips, Kadalai Pakkoda, Chandharakala (Sweet), Coconut Biscuit (each 250g)',
+              image: mixtureImg, // Use mixture image as main
+              prices: { '250g': 370 },
+              selectedQuantity: '250g',
+              isCombo: true,
+            },
+            {
+              _id: 'combo-premium',
+              name: '🥳 CRISPII PREMIUM FESTIVE BOX',
+              description: 'Mixture, Murukku, Potato Chips, Nendram Chips, Kadalai Pakkoda, Chandharakala, Chocolate Biscuit, Kadalai Mittai (see offer for weights)',
+              image: nendramImg, // Use nendram chips image as main
+              prices: { 'Box': 700 },
+              selectedQuantity: 'Box',
+              isCombo: true,
+            },
+          ];
+          setProducts([...comboProducts, ...updated]);
+        } else {
+          setProducts(updated);
+        }
       } catch (err) {
         console.error("Error fetching products:", err);
       } finally {
@@ -67,6 +95,10 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
   };
 
   const toggleFavourite = async (product) => {
+    if (!userId || userId === "guest" || userId === "" || userId === null || userId === "undefined") {
+      navigate("/login");
+      return;
+    }
     let favs = JSON.parse(localStorage.getItem('favourites') || '[]');
     if (favs.some(fav => fav._id === product._id)) {
       favs = favs.filter(fav => fav._id !== product._id);
@@ -85,66 +117,57 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
     setFavourites(favs);
   };
 
-  const addToCart = async (product) => {
-    // If user is not logged in, show full-screen friendly message then redirect to login
-    if (!userId || userId === "guest") {
-      setLoginRedirect(true);
+  async function addToCart(product) {
+    if (!userId || userId === "guest" || userId === "" || userId === null || userId === "undefined") {
+      navigate("/login");
       return;
     }
     try {
+      // For combos, do not send image field
+      const isCombo = product._id === 'combo-family' || product._id === 'combo-premium';
+      const payload = isCombo
+        ? {
+            productId: product._id,
+            name: product.name,
+            selectedQuantity: product.selectedQuantity,
+            price: product.prices[product.selectedQuantity],
+            quantity: 1,
+          }
+        : {
+            productId: product._id,
+            name: product.name,
+            image: product.image,
+            selectedQuantity: product.selectedQuantity,
+            price: product.prices[product.selectedQuantity],
+            quantity: 1,
+          };
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          productId: product._id,
-          name: product.name,
-          image: product.image,
-          selectedQuantity: product.selectedQuantity,
-          price: product.prices[product.selectedQuantity],
-          quantity: 1,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Show added animation on button
-        setAddedToCart((prev) => ({
-          ...prev,
-          [`${product._id}-${product.selectedQuantity}`]: true,
-        }));
-
-        // Show floating notification
-        showNotification(product.name);
-
-        // Remove button animation after 2 seconds
-        setTimeout(() => {
-          setAddedToCart((prev) => ({
-            ...prev,
-            [`${product._id}-${product.selectedQuantity}`]: false,
-          }));
-        }, 2000);
-
-        // Notify parent component (Navbar) to update cart count
         if (onCartUpdate) {
-          onCartUpdate(data.items.length);
+          onCartUpdate();
         }
+        // mark this item as added (so button shows "Added") and show notification
+        const itemKey = `${product._id}-${product.selectedQuantity}`;
+        _setAddedToCart((prev) => ({ ...prev, [itemKey]: true }));
+        showNotification(`${product.name} added to cart`);
+        // no redirect to cart page
+      } else {
+        showNotification(data.error || 'Failed to add to cart');
       }
     } catch (err) {
       console.error("Error adding to cart:", err);
+      showNotification('Error adding to cart');
     }
   };
-
-  // when loginRedirect becomes true, navigate to the login page after a short delay
-  useEffect(() => {
-    if (!loginRedirect) return;
-    const timer = setTimeout(() => {
-      navigate("/login", { state: { from: window.location.pathname } });
-    }, 1500); // 1.5s so user can read the message
-    return () => clearTimeout(timer);
-  }, [loginRedirect, navigate]);
 
   if (loading) {
     return (
@@ -159,18 +182,6 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
       <div className="flex flex-col items-center justify-center min-h-screen text-gray-500 px-4">
         <Package size={48} className="mb-3" />
         <p className="text-lg font-semibold">No products found</p>
-      </div>
-    );
-  }
-
-  // Show a short, catchy full-screen message and redirect when user is not signed in (like MyOrder)
-  if (loginRedirect) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Almost there!</h2>
-          <p className="text-gray-600 mb-6">Hang on! Your snack cart is warming up let’s get you signed in 🍪</p>
-        </div>
       </div>
     );
   }
@@ -255,9 +266,12 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
                       alt={p.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src =
-                          "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                        // Only set fallback if not already set to fallback URL
+                        if (!e.currentTarget.src.includes('no-image.png')) {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src =
+                            "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                        }
                       }}
                     />
                     {/* Heart Icon */}
@@ -300,9 +314,19 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
 
                         {/* Price and Add to Cart Button */}
                         <div className="mt-2 flex items-center justify-between gap-2">
-                          <p className="text-base font-bold text-green-600">
-                            ₹{p.prices[p.selectedQuantity]}
-                          </p>
+                          <div className="flex items-center">
+                            {(() => {
+                              const price = Number(p.prices[p.selectedQuantity]) || 0;
+                              const offerPrice = price; // show exact DB price
+                              const original = Math.round(price * 1.3) || 0;
+                              return (
+                                <>
+                                  <span className="text-gray-400 text-sm line-through mr-1">₹{original}</span>
+                                  <span className="text-base font-bold text-green-600">₹{offerPrice}</span>
+                                </>
+                              );
+                            })()}
+                          </div>
                           <button
                             type="button"
                             onClick={(e) => {
