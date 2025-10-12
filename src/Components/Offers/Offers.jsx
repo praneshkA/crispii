@@ -1,100 +1,181 @@
-import nendramImg from '../../assets/banana.jpg';
-import chocolateBiscuitImg from '../../assets/chocolate  biscut.png';
-import kadalaiMittaiImg from '../../assets/kadalai mitati.jpg';
-
+// Fixed Offers.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { BASE_API_URL } from '../../config';
 import { motion as Motion } from "framer-motion";
 import { createPortal } from "react-dom";
+import { BASE_API_URL } from "../../config";
 
-import mixtureImg from '../../assets/mixture.jpeg';
-import murukkuImg from '../../assets/mullu re.jpg';
-import potatoImg from '../../assets/potato chips.jpg';
-import pakkodaImg from '../../assets/Kadalai Pakkoda.jpg';
-import chandharakalaImg from '../../assets/chandrakala.jpg';
-import coconutBiscuitImg from '../../assets/coconut biscuit.jpg';
-
+// Local images
+import mixtureImg from "../../assets/mixture.jpeg";
+import murukkuImg from "../../assets/mullu re.jpg";
+import potatoImg from "../../assets/potato chips.jpg";
+import pakkodaImg from "../../assets/Kadalai Pakkoda.jpg";
+import chandharakalaImg from "../../assets/chandrakala.jpg";
+import coconutBiscuitImg from "../../assets/coconut biscuit.jpg";
+import maravalliImg from "../../assets/maravalli.jpg";
+import wheelChipsImg from "../../assets/wheel-Chips.jpg";
+import karasevImg from "../../assets/kaarasev.jpg";
+import karaboondhiImg from "../../assets/kaaraboondhi.jpg";
+import gulabJamunImg from "../../assets/gulab jamun.jpg";
+import chocolateBiscuitImg from "../../assets/chocolate  biscut.png";
+import kadalaiMittaiImg from "../../assets/kadalai mitati.jpg";
+import nendramImg from "../../assets/banana.jpg";
 
 const Offers = ({ onCartUpdate }) => {
   const navigate = useNavigate();
   const [notification, setNotification] = React.useState("");
 
-  // Add to cart logic (simulate as in ProductList)
-  const userId = sessionStorage.getItem('userId') || 'guest';
-  const addComboToCart = async (combo) => {
-    if (!userId || userId === 'guest') {
-      navigate('/login');
+  // 🧾 Combo details centralized
+  const comboProducts = {
+    "Family Combo": {
+      _id: "combo-family",
+      name: "Crispii Family Combo",
+      // Use local image from first included item for thumbnail (ensures visibility in cart)
+      image: mixtureImg,
+      selectedQuantity: "Box",
+      prices: { Box: 420 },
+      price: 420,
+      includes: [
+        { name: "Mixture", img: mixtureImg, qty: "250g" },
+        { name: "Murukku", img: murukkuImg, qty: "250g" },
+        { name: "Potato Chips", img: potatoImg, qty: "250g" },
+        { name: "Kadalai Pakkoda", img: pakkodaImg, qty: "250g" },
+        { name: "Chandharakala (Sweet)", img: chandharakalaImg, qty: "250g" },
+        { name: "Coconut Biscuit", img: coconutBiscuitImg, qty: "250g" },
+      ],
+      color: "yellow",
+    },
+    "Premium Festive Box": {
+      _id: "combo-premium",
+      name: "Crispii Premium Festive Box",
+      // Use local image from first included item for thumbnail (ensures visibility in cart)
+      image: mixtureImg,
+      selectedQuantity: "Box",
+      prices: { Box: 750 },
+      price: 750,
+      includes: [
+        { name: "Mixture", img: mixtureImg, qty: "500g" },
+        { name: "Murukku", img: murukkuImg, qty: "500g" },
+        { name: "Potato Chips", img: potatoImg, qty: "500g" },
+        { name: "Nendram Chips", img: nendramImg, qty: "500g" },
+        { name: "Kadalai Pakkoda", img: pakkodaImg, qty: "500g" },
+        { name: "Chandharakala", img: chandharakalaImg, qty: "250g" },
+        { name: "Chocolate Biscuit", img: chocolateBiscuitImg, qty: "250g" },
+        { name: "Kadalai Mittai", img: kadalaiMittaiImg, qty: "250g" },
+      ],
+      color: "pink",
+    },
+    "Crunch Combo": {
+      _id: "combo-crunch",
+      name: "Family 4-Item Combo",
+      // Use local image from first included item for thumbnail (ensures visibility in cart)
+      image: mixtureImg,
+      selectedQuantity: "Pack",
+      prices: { Pack: 399 },
+      price: 399,
+      includes: [
+        { name: "Mixture", img: mixtureImg, qty: "500g" },
+        { name: "Kadalai Pakkoda", img: pakkodaImg, qty: "500g" },
+        { name: "Maravalli Chips", img: maravalliImg, qty: "500g" },
+        { name: "Wheel Chips", img: wheelChipsImg, qty: "500g" },
+      ],
+      color: "yellow",
+    },
+    "Starter 4-Item Combo": {
+      _id: "combo-starter",
+      name: "Starter 4-Item Combo",
+      // Use local image from first included item for thumbnail (ensures visibility in cart)
+      image: mixtureImg,
+      selectedQuantity: "Pack",
+      prices: { Pack: 249 },
+      price: 249,
+      includes: [
+        { name: "Mixture", img: mixtureImg, qty: "250g" },
+        { name: "Karasev", img: karasevImg, qty: "250g" },
+        { name: "Coconut Biscuit", img: coconutBiscuitImg, qty: "250g" },
+        { name: "Chocolate Biscuit", img: chocolateBiscuitImg, qty: "250g" },
+      ],
+      color: "pink",
+    },
+    "Mega Sweet & Snack 4-Item Combo": {
+      _id: "combo-mega",
+      name: "Mega Sweet & Snack 4-Item Combo",
+      // Use local image from first included item for thumbnail (ensures visibility in cart)
+      image: karaboondhiImg,
+      selectedQuantity: "Pack",
+      prices: { Pack: 449 },
+      price: 449,
+      includes: [
+        { name: "Karaboondhi", img: karaboondhiImg, qty: "500g" },
+        { name: "Kadalai", img: kadalaiMittaiImg, qty: "500g" },
+        { name: "Chocolate Biscuit", img: chocolateBiscuitImg, qty: "500g" },
+        { name: "Gulab Jamun", img: gulabJamunImg, qty: "6 pcs (~250g)" },
+      ],
+      color: "yellow",
+    },
+  };
+
+  const userId = sessionStorage.getItem("userId") || "guest";
+
+  const addComboToCart = async (comboKey) => {
+    if (!userId || userId === "guest") {
+      navigate("/login");
       return;
     }
-    let comboProduct;
-    if (combo === 'Family Combo') {
-      comboProduct = {
-        _id: 'combo-family',
-        name: 'Crispii Family Combo',
-        image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760178404/combo_card_e9g46j.jpg',
-        selectedQuantity: '250g',
-        prices: { '250g': 370 },
-        price: 370,
-      };
-    } else {
-      comboProduct = {
-        _id: 'combo-premium',
-        name: 'Crispii Premium Festive Box',
-        image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760178404/combo_card_e9g46j.jpg',
-        selectedQuantity: 'Box',
-        prices: { 'Box': 700 },
-        price: 700,
-      };
-    }
+
+    const combo = comboProducts[comboKey];
+    
+    console.log("Adding combo to cart:", {
+      productId: combo._id,
+      name: combo.name,
+      image: combo.image,
+      selectedQuantity: combo.selectedQuantity,
+      price: combo.price,
+      quantity: 1,
+    });
+
     try {
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          productId: comboProduct._id,
-          name: comboProduct.name,
-          image: comboProduct.image,
-          selectedQuantity: comboProduct.selectedQuantity,
-          price: comboProduct.price,
+          productId: combo._id,
+          name: combo.name,
+          image: combo.image,
+          selectedQuantity: combo.selectedQuantity,
+          prices: combo.prices,
+          price: combo.price,
           quantity: 1,
-        })
+        }),
       });
       const data = await response.json();
+
       if (response.ok) {
-        if (onCartUpdate) {
-          onCartUpdate();
-        }
-  setNotification(`${comboProduct.name} added to cart!`);
-  setTimeout(() => setNotification("") , 2000);
+        if (onCartUpdate) onCartUpdate();
+        setNotification(`${combo.name} added to cart!`);
       } else {
-  setNotification(`Failed to add: ${data.error || 'Unknown error'}`);
-  setTimeout(() => setNotification("") , 2000);
+        setNotification(`Failed to add: ${data.error || "Unknown error"}`);
       }
-      console.log('Add to cart response:', data);
     } catch (err) {
-  setNotification('Error adding to cart');
-  setTimeout(() => setNotification("") , 2000);
-      console.error('Add to cart error:', err);
+      console.error("Error adding combo:", err);
+      setNotification("Error adding combo to cart");
     }
+
+    setTimeout(() => setNotification(""), 2000);
   };
 
   return (
     <Motion.section
-      className="w-full max-w-lg px-6 py-8 bg-white rounded-2xl shadow-md mx-auto my-6 text-center"
+      className="w-full max-w-3xl px-6 py-8 bg-white rounded-2xl shadow-md mx-auto my-6 text-center"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      whileHover={{ scale: 1.03, boxShadow: "0 8px 25px rgba(0,0,0,0.1)" }}
-      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
     >
-
-      {/* Notification (render via portal so it's top-center of viewport) */}
       {notification &&
         createPortal(
-          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
-            <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 min-w-[250px] animate-float-up">
-              <span className="text-sm font-medium">{notification}</span>
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg">
+              {notification}
             </div>
           </div>,
           document.body
@@ -106,154 +187,67 @@ const Offers = ({ onCartUpdate }) => {
         whileInView={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.4 }}
       >
-        Special Combos <span role="img" aria-label="gift">🎁</span>
+        Special Combos 🎁
       </Motion.h2>
 
-      <Motion.p
-        className="text-gray-700 text-base md:text-lg"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-      >
+      <p className="text-gray-700 text-base md:text-lg mb-8">
         Don't miss out on our limited-time snack deals.
-      </Motion.p>
+      </p>
 
-      <div className="mt-6 space-y-8">
-  {/* Crispii Family Combo */}
-  <div className="border-2 border-yellow-400 rounded-xl bg-yellow-50 p-4 shadow-md">
-          <div className="flex flex-col items-center">
-            <span className="text-2xl font-bold mb-2">🎁 Crispii Family Combo – ₹370 Only</span>
-            <span className="text-base text-gray-700 mb-4">Combo Includes:</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-3">
-              <img src={mixtureImg} alt="Mixture" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Mixture</div>
-                <div className="text-xs text-gray-500">250g</div>
-              </div>
+      {/* 🧩 Auto-render all combos */}
+      <div className="space-y-8">
+        {Object.entries(comboProducts).map(([key, combo]) => (
+          <div
+            key={combo._id}
+            className={`border-2 rounded-xl p-4 shadow-md ${
+              combo.color === "yellow" ? "bg-yellow-50 border-yellow-400" : "bg-pink-50 border-pink-400"
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              <img
+                src={combo.image}
+                alt={combo.name}
+                className="w-24 h-24 object-cover rounded-lg mb-3"
+              />
+              <span className="text-2xl font-bold mb-2">
+                🎉 {combo.name} – ₹{combo.price} Only
+              </span>
+              <span className="text-base text-gray-700 mb-4">
+                Combo Includes:
+              </span>
             </div>
-            <div className="flex items-center space-x-3">
-              <img src={murukkuImg} alt="Murukku" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Murukku</div>
-                <div className="text-xs text-gray-500">250g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={potatoImg} alt="Potato Chips" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Potato Chips</div>
-                <div className="text-xs text-gray-500">250g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={pakkodaImg} alt="Kadalai Pakkoda" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Kadalai Pakkoda</div>
-                <div className="text-xs text-gray-500">250g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={chandharakalaImg} alt="Chandharakala (Sweet)" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Chandharakala (Sweet)</div>
-                <div className="text-xs text-gray-500">250g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={coconutBiscuitImg} alt="Coconut Biscuit" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Coconut Biscuit</div>
-                <div className="text-xs text-gray-500">250g</div>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-full shadow"
-              onClick={() => addComboToCart("Family Combo")}
-            >
-              Add to Cart
-            </button>
-          </div>
-        </div>
-  {/* CRISPII PREMIUM FESTIVE BOX */}
-  <div className="border-2 border-pink-400 rounded-xl bg-pink-50 p-4 shadow-md">
-          <div className="flex flex-col items-center">
-            <span className="text-2xl font-bold mb-2">🥳 CRISPII PREMIUM FESTIVE BOX – ₹700 ONLY</span>
-            <span className="text-base text-gray-700 mb-4">Combo Includes:</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-3">
-              <img src={mixtureImg} alt="Mixture" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Mixture</div>
-                <div className="text-xs text-gray-500">500g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={murukkuImg} alt="Murukku" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Murukku</div>
-                <div className="text-xs text-gray-500">500g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={potatoImg} alt="Potato Chips" className="w-16 h-16 object-cover rounded" />
-              <div>
-                <div className="font-semibold">Potato Chips</div>
-                <div className="text-xs text-gray-500">500g</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={nendramImg} alt="Nendram Chips" className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <div className="font-semibold">Nendram Chips</div>
-                  <div className="text-xs text-gray-500">500g</div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {combo.includes.map((item, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <div>
+                    <div className="font-semibold">{item.name}</div>
+                    <div className="text-xs text-gray-500">{item.qty}</div>
+                  </div>
                 </div>
+              ))}
             </div>
-            <div className="flex items-center space-x-3">
-              <img src={pakkodaImg} alt="Kadalai Pakkoda" className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <div className="font-semibold">Kadalai Pakkoda</div>
-                  <div className="text-xs text-gray-500">500g</div>
-                </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={chandharakalaImg} alt="Chandharakala" className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <div className="font-semibold">Chandharakala</div>
-                  <div className="text-xs text-gray-500">250g</div>
-                </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={chocolateBiscuitImg} alt="Chocolate Biscuit" className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <div className="font-semibold">Chocolate Biscuit</div>
-                  <div className="text-xs text-gray-500">250g</div>
-                </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <img src={kadalaiMittaiImg} alt="Kadalai Mittai" className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <div className="font-semibold">Kadalai Mittai</div>
-                  <div className="text-xs text-gray-500">250g</div>
-                </div>
+
+            <div className="flex justify-center mt-4">
+              <button
+                className={`${
+                  combo.color === "yellow" 
+                    ? "bg-yellow-400 hover:bg-yellow-500" 
+                    : "bg-pink-400 hover:bg-pink-500"
+                } text-white font-bold py-2 px-6 rounded-full shadow`}
+                onClick={() => addComboToCart(key)}
+              >
+                Add to Cart
+              </button>
             </div>
           </div>
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-full shadow"
-              onClick={() => addComboToCart("Premium Festive Box")}
-            >
-              Add to Cart
-            </button>
-          </div>
-        </div>
-        
+        ))}
       </div>
-      
     </Motion.section>
   );
 };

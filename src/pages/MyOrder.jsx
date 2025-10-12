@@ -285,10 +285,7 @@ const MyOrders = () => {
                   <div className="border-t pt-4 sm:pt-6">
                     <h3 className="font-bold text-base sm:text-lg text-gray-800 mb-3 sm:mb-4">Payment Information</h3>
                     <div className="bg-blue-50 rounded-xl p-3 sm:p-4 space-y-2">
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-600">Payment Status:</span>
-                        <span className="font-semibold text-gray-800">{selectedOrder.paymentStatus}</span>
-                      </div>
+                      
                       <div className="flex justify-between text-base sm:text-lg font-bold pt-2 border-t border-blue-200">
                         <span>Total Amount:</span>
                         <span className="text-blue-600">₹{selectedOrder.totalAmount}</span>

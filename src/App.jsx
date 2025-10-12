@@ -41,6 +41,7 @@ const HomePage = ({ onCartUpdate }) => (
 );
 
 function App() {
+  
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false); // Added state for menu
@@ -202,6 +203,8 @@ function App() {
       <Footer />
     </BrowserRouter>
   );
+
 }
+
 
 export default App;

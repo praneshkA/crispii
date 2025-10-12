@@ -1,4 +1,4 @@
-// frontend/src/Components/CartItems.jsx
+// Fixed CartItems.jsx
 import React from "react";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { BASE_API_URL } from '../../config';
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
   const navigate = useNavigate();
   const [showCrackers, setShowCrackers] = React.useState(false);
+  const isInitialMount = React.useRef(true);
 
   // If user is not logged in, redirect to login page
   React.useEffect(() => {
@@ -17,14 +18,21 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
     }
   }, [navigate, userId]);
 
-  // Trigger crackers animation when cart has items
+  // Trigger crackers animation when items are added to cart
   React.useEffect(() => {
+    // Skip animation on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Only show animation when cart has items
     if (cartItems.length > 0) {
       setShowCrackers(true);
       const timer = setTimeout(() => setShowCrackers(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [cartItems.length]);
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
@@ -63,7 +71,7 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
           {[...Array(50)].map((_, i) => (
             <div
               key={i}
-              className="absolute animate-confetti"
+              className="absolute"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: '-10px',
@@ -71,8 +79,7 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
                 height: `${Math.random() * 10 + 5}px`,
                 backgroundColor: ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d96ff', '#ff69eb'][Math.floor(Math.random() * 5)],
                 borderRadius: Math.random() > 0.5 ? '50%' : '0',
-                animationDelay: `${Math.random() * 0.5}s`,
-                animationDuration: `${Math.random() * 2 + 2}s`,
+                animation: `confetti ${Math.random() * 2 + 2}s linear ${Math.random() * 0.5}s forwards`,
                 transform: `rotate(${Math.random() * 360}deg)`
               }}
             />
@@ -82,13 +89,12 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
           {[...Array(30)].map((_, i) => (
             <div
               key={`sparkle-${i}`}
-              className="absolute animate-sparkle"
+              className="absolute"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 50}%`,
                 fontSize: `${Math.random() * 20 + 15}px`,
-                animationDelay: `${Math.random() * 1}s`,
-                animationDuration: `${Math.random() * 1 + 1}s`
+                animation: `sparkle ${Math.random() * 1 + 1}s ease-in-out ${Math.random() * 1}s infinite`
               }}
             >
               ✨
@@ -96,7 +102,13 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
           ))}
 
           {/* Celebration text */}
-          <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-bounce-in text-center">
+          <div 
+            className="absolute top-1/4 left-1/2 text-center"
+            style={{
+              transform: 'translate(-50%, -50%)',
+              animation: 'bounce-in 0.6s ease-out'
+            }}
+          >
             <div className="text-4xl font-bold text-yellow-500 drop-shadow-lg">
               🎉 Yay! 🎉
             </div>
@@ -121,9 +133,13 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
           {cartItems.map((item) => {
             const server = BASE_API_URL;
             let imgPath = item.image || "";
-            let src = imgPath.startsWith("http")
-              ? imgPath
-              : `${server}${imgPath}`;
+            // Fixed image src logic: Handle absolute URLs, frontend static assets (/static/media/), and server-relative paths
+            let src;
+            if (imgPath.startsWith("http") || imgPath.includes("/static/media/")) {
+              src = imgPath;
+            } else {
+              src = `${server}${imgPath}`;
+            }
 
             return (
               <div
@@ -208,7 +224,7 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes confetti {
           0% {
             transform: translateY(0) rotate(0deg);
@@ -243,18 +259,6 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
             transform: translate(-50%, -50%) scale(1);
             opacity: 1;
           }
-        }
-
-        .animate-confetti {
-          animation: confetti linear forwards;
-        }
-
-        .animate-sparkle {
-          animation: sparkle ease-in-out infinite;
-        }
-
-        .animate-bounce-in {
-          animation: bounce-in 0.6s ease-out;
         }
       `}</style>
     </div>

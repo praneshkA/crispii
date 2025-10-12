@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { CheckCircle, Upload, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { CheckCircle, Upload, X, Smartphone } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import qrcode from "../assets/qrcode.jpg";
+import QRCode from "react-qr-code";
 import { BASE_API_URL } from "../config";
+
 
 const Payment = () => {
   const location = useLocation();
@@ -14,9 +15,26 @@ const Payment = () => {
   const [preview, setPreview] = useState(null);
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const UPI_ID = "praneshalagesan@oksbi";
+  const MERCHANT_NAME = "Pranesh";
+
+  // Generate UPI string
+  const upiString = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${totalAmount || 0}&cu=INR`;
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Redirect if no data
-  React.useEffect(() => {
+  useEffect(() => {
     if (!formData || !cartItems) {
       alert("No order data found. Please complete checkout first.");
       navigate("/checkout");
@@ -24,11 +42,10 @@ const Payment = () => {
   }, [formData, cartItems, navigate]);
 
   // Require authentication before placing an order
-  React.useEffect(() => {
+  useEffect(() => {
     const authToken = sessionStorage.getItem('authToken');
     const userId = sessionStorage.getItem('userId') || 'guest';
     if (!authToken || userId === 'guest') {
-      // redirect to login/signup and include return state so user comes back here
       navigate('/login', { state: { from: '/payment', returnState: { formData, cartItems, totalAmount } } });
     }
   }, [formData, cartItems, totalAmount, navigate]);
@@ -36,13 +53,11 @@ const Payment = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // Validate file type
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(selectedFile.type)) {
         alert('Please upload a valid image file (JPG, PNG, GIF, WEBP)');
         return;
       }
-      // Validate file size (5MB)
       if (selectedFile.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         return;
@@ -62,6 +77,10 @@ const Payment = () => {
     setPreview(null);
   };
 
+  const handleUpiDeepLink = () => {
+    window.location.href = upiString;
+  };
+
   const handleUpload = async () => {
     if (!file) {
       alert("Please upload a payment screenshot first");
@@ -71,17 +90,11 @@ const Payment = () => {
     setLoading(true);
 
     try {
-      // Create FormData object
       const formDataObj = new FormData();
-      
-      // Get userId from sessionStorage (from login/signup)
       const userId = sessionStorage.getItem("userId") || "guest";
       formDataObj.append('userId', userId);
-
-      // Add customer details as JSON string
       formDataObj.append('customerDetails', JSON.stringify(formData));
 
-      // Add cart items as JSON string
       const items = cartItems.map(item => ({
         productId: item._id || item.productId,
         name: item.name,
@@ -91,17 +104,12 @@ const Payment = () => {
         quantity: item.quantity,
       }));
       formDataObj.append('items', JSON.stringify(items));
-
-      // Add total amount
       formDataObj.append('totalAmount', totalAmount);
-
-      // Add payment screenshot file
       formDataObj.append('paymentScreenshot', file);
 
-      // Send to backend
       const response = await fetch(`${BASE_API_URL}/api/orders`, {
         method: "POST",
-        body: formDataObj, // Don't set Content-Type header - browser will set it automatically with boundary
+        body: formDataObj,
       });
 
       const orderResp = await response.json();
@@ -110,14 +118,9 @@ const Payment = () => {
         setOrderId(orderResp.orderId);
         setUploaded(true);
         
-        // userId is stored in sessionStorage upon login; no need to persist in localStorage
-        
-        // Store order ID for tracking
         const myOrders = JSON.parse(localStorage.getItem('myOrders') || '[]');
         myOrders.push(orderResp.orderId);
         localStorage.setItem('myOrders', JSON.stringify(myOrders));
-        
-        // Optional: Clear cart after successful order
         localStorage.removeItem('cart');
       } else {
         alert(orderResp.message || "Failed to create order");
@@ -169,6 +172,111 @@ const Payment = () => {
     );
   }
 
+  // Mobile View
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+              Complete Payment
+            </h1>
+            <p className="text-xl font-bold text-blue-600 mt-2">
+              ₹{totalAmount?.toFixed(2)}
+            </p>
+          </div>
+
+          {/* UPI Payment Section */}
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white text-center mb-4">
+              <Smartphone className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold mb-2">Pay via UPI</h3>
+              <p className="text-sm opacity-90 mb-4">Click below to open your UPI app</p>
+              <button
+                onClick={handleUpiDeepLink}
+                className="bg-white text-blue-600 py-3 px-6 rounded-lg font-semibold w-full hover:bg-gray-100 transition shadow-lg"
+              >
+                Open UPI App
+              </button>
+            </div>
+
+            {/* QR Code */}
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-600 mb-3">Or scan this QR code</p>
+              <div className="bg-white p-4 rounded-xl border-2 border-gray-200 inline-block">
+                <QRCode
+                  value={upiString}
+                  size={192}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-3">UPI ID: {UPI_ID}</p>
+            </div>
+          </div>
+
+          {/* Upload Screenshot Section */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Upload Payment Proof</h3>
+            
+            {!preview ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload-mobile"
+                />
+                <label htmlFor="file-upload-mobile" className="cursor-pointer">
+                  <Upload className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-1">
+                    Tap to upload screenshot
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG up to 5MB
+                  </p>
+                </label>
+              </div>
+            ) : (
+              <div className="relative border-2 border-blue-400 rounded-xl p-2 mb-4">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <button
+                  onClick={handleRemoveFile}
+                  className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={handleUpload}
+              disabled={!file || loading}
+              className={`w-full mt-4 py-3 px-6 rounded-xl font-semibold transition ${
+                file && !loading
+                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              {loading ? "Submitting..." : "Submit Payment Proof"}
+            </button>
+
+            <p className="text-xs text-green-500 text-center mt-3">
+              Payment verified within 2 hours
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop View with Generated QR Code
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
@@ -187,17 +295,18 @@ const Payment = () => {
         <div className="grid md:grid-cols-2 gap-9">
           {/* QR Code Section */}
           <div className="flex flex-col items-center">
-            <div className="bg-gray-50 p-4 rounded-xl border-4 border-gray-200">
-              <img
-                src={qrcode}
-                alt="Payment QR Code"
-                style={{ width: "600px", height: "300px" }}
-                className="object-contain"
+            <div className="bg-gray-50 p-6 rounded-xl border-4 border-gray-200">
+              <QRCode
+                value={upiString}
+                size={256}
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="M"
               />
             </div>
             <div className="mt-5 text-center">
-              <p className="text-sm font-semibold text-gray-700">UPI ID: praneshalagesan@okicici</p>
-              <p className="text-xs text-gray-500 mt-6">
+              <p className="text-sm font-semibold text-gray-700">UPI ID: {UPI_ID}</p>
+              <p className="text-xs text-gray-500 mt-2">
                 Use any UPI app to complete payment
               </p>
             </div>

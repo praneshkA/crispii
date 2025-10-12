@@ -4,7 +4,7 @@ import React from "react";
 const ScrollingBanner = () => {
   const messages = [
     "Time to crunch into your favorites 😋",
-    "🚚 Free delivery on orders above ₹349",
+    "🚚 Free delivery on orders above ₹399",
     "🥗 No preservatives",
     "🌟 Authentic Taste",
     "🌴 No palm oil",
