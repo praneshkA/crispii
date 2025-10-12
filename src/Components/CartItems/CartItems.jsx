@@ -1,4 +1,4 @@
-// Fixed CartItems.jsx
+// frontend/src/Components/CartItems.jsx
 import React from "react";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { BASE_API_URL } from '../../config';
@@ -133,13 +133,9 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
           {cartItems.map((item) => {
             const server = BASE_API_URL;
             let imgPath = item.image || "";
-            // Fixed image src logic: Handle absolute URLs, frontend static assets (/static/media/), and server-relative paths
-            let src;
-            if (imgPath.startsWith("http") || imgPath.includes("/static/media/")) {
-              src = imgPath;
-            } else {
-              src = `${server}${imgPath}`;
-            }
+            let src = imgPath.startsWith("http")
+              ? imgPath
+              : `${server}${imgPath}`;
 
             return (
               <div

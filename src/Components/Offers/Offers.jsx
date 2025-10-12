@@ -1,4 +1,3 @@
-// Fixed Offers.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
@@ -30,10 +29,8 @@ const Offers = ({ onCartUpdate }) => {
     "Family Combo": {
       _id: "combo-family",
       name: "Crispii Family Combo",
-      // Use local image from first included item for thumbnail (ensures visibility in cart)
-      image: mixtureImg,
-      selectedQuantity: "Box",
-      prices: { Box: 420 },
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291342/Pink_Yellow_Fun_Comic_Thank_You_Instagram_Post_lxldoz.png",
       price: 420,
       includes: [
         { name: "Mixture", img: mixtureImg, qty: "250g" },
@@ -48,10 +45,8 @@ const Offers = ({ onCartUpdate }) => {
     "Premium Festive Box": {
       _id: "combo-premium",
       name: "Crispii Premium Festive Box",
-      // Use local image from first included item for thumbnail (ensures visibility in cart)
-      image: mixtureImg,
-      selectedQuantity: "Box",
-      prices: { Box: 750 },
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png",
       price: 750,
       includes: [
         { name: "Mixture", img: mixtureImg, qty: "500g" },
@@ -68,10 +63,8 @@ const Offers = ({ onCartUpdate }) => {
     "Crunch Combo": {
       _id: "combo-crunch",
       name: "Family 4-Item Combo",
-      // Use local image from first included item for thumbnail (ensures visibility in cart)
-      image: mixtureImg,
-      selectedQuantity: "Pack",
-      prices: { Pack: 399 },
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291391/Gold_and_Red_Indian_Truck_Art_Indian_Food_Logo_sgjrht.png",
       price: 399,
       includes: [
         { name: "Mixture", img: mixtureImg, qty: "500g" },
@@ -84,10 +77,8 @@ const Offers = ({ onCartUpdate }) => {
     "Starter 4-Item Combo": {
       _id: "combo-starter",
       name: "Starter 4-Item Combo",
-      // Use local image from first included item for thumbnail (ensures visibility in cart)
-      image: mixtureImg,
-      selectedQuantity: "Pack",
-      prices: { Pack: 249 },
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291396/Green_and_Orange_Playful_Hand-drawn_Indian_Tea_Stall_Food_Logo_qs30l3.png",
       price: 249,
       includes: [
         { name: "Mixture", img: mixtureImg, qty: "250g" },
@@ -100,10 +91,8 @@ const Offers = ({ onCartUpdate }) => {
     "Mega Sweet & Snack 4-Item Combo": {
       _id: "combo-mega",
       name: "Mega Sweet & Snack 4-Item Combo",
-      // Use local image from first included item for thumbnail (ensures visibility in cart)
-      image: karaboondhiImg,
-      selectedQuantity: "Pack",
-      prices: { Pack: 449 },
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png",
       price: 449,
       includes: [
         { name: "Karaboondhi", img: karaboondhiImg, qty: "500g" },
@@ -124,16 +113,6 @@ const Offers = ({ onCartUpdate }) => {
     }
 
     const combo = comboProducts[comboKey];
-    
-    console.log("Adding combo to cart:", {
-      productId: combo._id,
-      name: combo.name,
-      image: combo.image,
-      selectedQuantity: combo.selectedQuantity,
-      price: combo.price,
-      quantity: 1,
-    });
-
     try {
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
         method: "POST",
@@ -142,8 +121,7 @@ const Offers = ({ onCartUpdate }) => {
           productId: combo._id,
           name: combo.name,
           image: combo.image,
-          selectedQuantity: combo.selectedQuantity,
-          prices: combo.prices,
+          selectedQuantity: "Pack",
           price: combo.price,
           quantity: 1,
         }),
@@ -199,9 +177,7 @@ const Offers = ({ onCartUpdate }) => {
         {Object.entries(comboProducts).map(([key, combo]) => (
           <div
             key={combo._id}
-            className={`border-2 rounded-xl p-4 shadow-md ${
-              combo.color === "yellow" ? "bg-yellow-50 border-yellow-400" : "bg-pink-50 border-pink-400"
-            }`}
+            className={`border-2 rounded-xl p-4 shadow-md bg-${combo.color}-50 border-${combo.color}-400`}
           >
             <div className="flex flex-col items-center">
               <img
@@ -235,11 +211,7 @@ const Offers = ({ onCartUpdate }) => {
 
             <div className="flex justify-center mt-4">
               <button
-                className={`${
-                  combo.color === "yellow" 
-                    ? "bg-yellow-400 hover:bg-yellow-500" 
-                    : "bg-pink-400 hover:bg-pink-500"
-                } text-white font-bold py-2 px-6 rounded-full shadow`}
+                className={`bg-${combo.color}-400 hover:bg-${combo.color}-500 text-white font-bold py-2 px-6 rounded-full shadow`}
                 onClick={() => addComboToCart(key)}
               >
                 Add to Cart
