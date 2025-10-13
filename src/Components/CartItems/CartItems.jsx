@@ -149,9 +149,11 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
                     alt={item.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src =
-                        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1759176000/crispii/no-image.png";
+                      // Only set fallback if not already set to fallback URL
+                      if (!e.currentTarget.src.includes('no-image.png')) {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                      }
                     }}
                   />
                 </div>

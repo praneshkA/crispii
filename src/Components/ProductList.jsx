@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_API_URL } from "../config";
-import mixtureImg from '../assets/mixture.jpeg';
 
-import nendramImg from '../assets/banana.jpg';
 import { Package, ShoppingCart, Check } from "lucide-react";
 import { FaHeart } from "react-icons/fa";
 import BackToHome from "./BackToHome/BackToHome";
@@ -17,7 +15,6 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
   const [notifications, setNotifications] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [favourites, setFavourites] = useState([]);
-  // userId is already provided as a prop
 
   const fetchFavourites = async () => {
     const favs = JSON.parse(localStorage.getItem('favourites') || '[]');
@@ -50,18 +47,45 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
               _id: 'combo-family',
               name: '🎁 Crispii Family Combo',
               description: 'Mixture, Murukku, Potato Chips, Kadalai Pakkoda, Chandharakala (Sweet), Coconut Biscuit (each 250g)',
-              image: mixtureImg, // Use mixture image as main
-              prices: { '250g': 370 },
-              selectedQuantity: '250g',
+              image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291342/Pink_Yellow_Fun_Comic_Thank_You_Instagram_Post_lxldoz.png',
+              prices: { 'Pack': 420 },
+              selectedQuantity: 'Pack',
               isCombo: true,
             },
             {
               _id: 'combo-premium',
               name: '🥳 CRISPII PREMIUM FESTIVE BOX',
-              description: 'Mixture, Murukku, Potato Chips, Nendram Chips, Kadalai Pakkoda, Chandharakala, Chocolate Biscuit, Kadalai Mittai (see offer for weights)',
-              image: nendramImg, // Use nendram chips image as main
-              prices: { 'Box': 700 },
-              selectedQuantity: 'Box',
+              description: 'Mixture, Murukku, Potato Chips, Nendram Chips, Kadalai Pakkoda, Chandharakala, Chocolate Biscuit, Kadalai Mittai (500g each except 250g for sweets)',
+              image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png',
+              prices: { 'Pack': 750 },
+              selectedQuantity: 'Pack',
+              isCombo: true,
+            },
+            {
+              _id: 'combo-crunch',
+              name: '🎉 Family 4-Item Combo',
+              description: 'Mixture, Kadalai Pakkoda, Maravalli Chips, Wheel Chips (each 500g)',
+              image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291391/Gold_and_Red_Indian_Truck_Art_Indian_Food_Logo_sgjrht.png',
+              prices: { 'Pack': 399 },
+              selectedQuantity: 'Pack',
+              isCombo: true,
+            },
+            {
+              _id: 'combo-starter',
+              name: '🌟 Starter 4-Item Combo',
+              description: 'Mixture, Karasev, Coconut Biscuit, Chocolate Biscuit (each 250g)',
+              image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291396/Green_and_Orange_Playful_Hand-drawn_Indian_Tea_Stall_Food_Logo_qs30l3.png',
+              prices: { 'Pack': 249 },
+              selectedQuantity: 'Pack',
+              isCombo: true,
+            },
+            {
+              _id: 'combo-mega',
+              name: '🍬 Mega Sweet & Snack 4-Item Combo',
+              description: 'Karaboondhi, Kadalai, Chocolate Biscuit (500g each), Gulab Jamun (6 pcs ~250g)',
+              image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png',
+              prices: { 'Pack': 449 },
+              selectedQuantity: 'Pack',
               isCombo: true,
             },
           ];
@@ -123,24 +147,15 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
       return;
     }
     try {
-      // For combos, do not send image field
-      const isCombo = product._id === 'combo-family' || product._id === 'combo-premium';
-      const payload = isCombo
-        ? {
-            productId: product._id,
-            name: product.name,
-            selectedQuantity: product.selectedQuantity,
-            price: product.prices[product.selectedQuantity],
-            quantity: 1,
-          }
-        : {
-            productId: product._id,
-            name: product.name,
-            image: product.image,
-            selectedQuantity: product.selectedQuantity,
-            price: product.prices[product.selectedQuantity],
-            quantity: 1,
-          };
+      const payload = {
+        productId: product._id,
+        name: product.name,
+        image: product.image,
+        selectedQuantity: product.selectedQuantity,
+        price: product.prices[product.selectedQuantity],
+        quantity: 1,
+      };
+
       const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
         method: "POST",
         headers: {
@@ -155,11 +170,9 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
         if (onCartUpdate) {
           onCartUpdate();
         }
-        // mark this item as added (so button shows "Added") and show notification
         const itemKey = `${product._id}-${product.selectedQuantity}`;
         _setAddedToCart((prev) => ({ ...prev, [itemKey]: true }));
         showNotification(`${product.name} added to cart`);
-        // no redirect to cart page
       } else {
         showNotification(data.error || 'Failed to add to cart');
       }
@@ -211,10 +224,7 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
       {/* Header with Back Arrow */}
       <div className="w-full bg-white/70 shadow-sm">
         <div className="max-w-screen-xl mx-auto flex items-center px-4 py-3 sm:py-5">
-          {/* Back button - now receives isMenuOpen prop */}
           <BackToHome isMenuOpen={isMenuOpen} />
-
-          {/* Title */}
           <h1 className="text-lg sm:text-xl font-bold text-gray-800 ml-9 truncate">
             {category
               ? category.charAt(0).toUpperCase() + category.slice(1)
@@ -266,7 +276,6 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
                       alt={p.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        // Only set fallback if not already set to fallback URL
                         if (!e.currentTarget.src.includes('no-image.png')) {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src =
@@ -317,7 +326,7 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
                           <div className="flex items-center">
                             {(() => {
                               const price = Number(p.prices[p.selectedQuantity]) || 0;
-                              const offerPrice = price; // show exact DB price
+                              const offerPrice = price;
                               const original = Math.round(price * 1.3) || 0;
                               return (
                                 <>

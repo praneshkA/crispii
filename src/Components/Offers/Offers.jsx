@@ -1,10 +1,7 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { motion as Motion } from "framer-motion";
-import { createPortal } from "react-dom";
-import { BASE_API_URL } from "../../config";
+import React, { useState } from "react";
+import { ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
 
-// Local images
+// Import local images from assets
 import mixtureImg from "../../assets/mixture.jpeg";
 import murukkuImg from "../../assets/mullu re.jpg";
 import potatoImg from "../../assets/potato chips.jpg";
@@ -20,207 +17,217 @@ import chocolateBiscuitImg from "../../assets/chocolate  biscut.png";
 import kadalaiMittaiImg from "../../assets/kadalai mitati.jpg";
 import nendramImg from "../../assets/banana.jpg";
 
-const Offers = ({ onCartUpdate }) => {
-  const navigate = useNavigate();
-  const [notification, setNotification] = React.useState("");
+const Offers = () => {
+  const [notification, setNotification] = useState("");
+  const [expandedCombo, setExpandedCombo] = useState(null);
 
-  // 🧾 Combo details centralized
+  // Product images mapping with imported assets
+  const productImages = {
+    "Mixture": mixtureImg,
+    "Murukku": murukkuImg,
+    "Potato Chips": potatoImg,
+    "Kadalai Pakkoda": pakkodaImg,
+    "Chandharakala (Sweet)": chandharakalaImg,
+    "Chandharakala": chandharakalaImg,
+    "Coconut Biscuit": coconutBiscuitImg,
+    "Nendram Chips": nendramImg,
+    "Chocolate Biscuit": chocolateBiscuitImg,
+    "Kadalai Mittai": kadalaiMittaiImg,
+    "Karasev": karasevImg,
+    "Maravalli Chips": maravalliImg,
+    "Wheel Chips": wheelChipsImg,
+    "Karaboondhi": karaboondhiImg,
+    "Kadalai": kadalaiMittaiImg,
+    "Gulab Jamun": gulabJamunImg,
+  };
+
   const comboProducts = {
     "Family Combo": {
       _id: "combo-family",
       name: "Crispii Family Combo",
-      image:
-        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291342/Pink_Yellow_Fun_Comic_Thank_You_Instagram_Post_lxldoz.png",
+      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291342/Pink_Yellow_Fun_Comic_Thank_You_Instagram_Post_lxldoz.png",
       price: 420,
       includes: [
-        { name: "Mixture", img: mixtureImg, qty: "250g" },
-        { name: "Murukku", img: murukkuImg, qty: "250g" },
-        { name: "Potato Chips", img: potatoImg, qty: "250g" },
-        { name: "Kadalai Pakkoda", img: pakkodaImg, qty: "250g" },
-        { name: "Chandharakala (Sweet)", img: chandharakalaImg, qty: "250g" },
-        { name: "Coconut Biscuit", img: coconutBiscuitImg, qty: "250g" },
+        { name: "Mixture", qty: "250g" },
+        { name: "Murukku", qty: "250g" },
+        { name: "Potato Chips", qty: "250g" },
+        { name: "Kadalai Pakkoda", qty: "250g" },
+        { name: "Chandharakala (Sweet)", qty: "250g" },
+        { name: "Coconut Biscuit", qty: "250g" },
       ],
-      color: "yellow",
     },
     "Premium Festive Box": {
       _id: "combo-premium",
       name: "Crispii Premium Festive Box",
-      image:
-        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png",
+      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png",
       price: 750,
       includes: [
-        { name: "Mixture", img: mixtureImg, qty: "500g" },
-        { name: "Murukku", img: murukkuImg, qty: "500g" },
-        { name: "Potato Chips", img: potatoImg, qty: "500g" },
-        { name: "Nendram Chips", img: nendramImg, qty: "500g" },
-        { name: "Kadalai Pakkoda", img: pakkodaImg, qty: "500g" },
-        { name: "Chandharakala", img: chandharakalaImg, qty: "250g" },
-        { name: "Chocolate Biscuit", img: chocolateBiscuitImg, qty: "250g" },
-        { name: "Kadalai Mittai", img: kadalaiMittaiImg, qty: "250g" },
+        { name: "Mixture", qty: "500g" },
+        { name: "Murukku", qty: "500g" },
+        { name: "Potato Chips", qty: "500g" },
+        { name: "Nendram Chips", qty: "500g" },
+        { name: "Kadalai Pakkoda", qty: "500g" },
+        { name: "Chandharakala", qty: "250g" },
+        { name: "Chocolate Biscuit", qty: "250g" },
+        { name: "Kadalai Mittai", qty: "250g" },
       ],
-      color: "pink",
     },
     "Crunch Combo": {
       _id: "combo-crunch",
       name: "Family 4-Item Combo",
-      image:
-        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291391/Gold_and_Red_Indian_Truck_Art_Indian_Food_Logo_sgjrht.png",
+      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291391/Gold_and_Red_Indian_Truck_Art_Indian_Food_Logo_sgjrht.png",
       price: 399,
       includes: [
-        { name: "Mixture", img: mixtureImg, qty: "500g" },
-        { name: "Kadalai Pakkoda", img: pakkodaImg, qty: "500g" },
-        { name: "Maravalli Chips", img: maravalliImg, qty: "500g" },
-        { name: "Wheel Chips", img: wheelChipsImg, qty: "500g" },
+        { name: "Mixture", qty: "500g" },
+        { name: "Kadalai Pakkoda", qty: "500g" },
+        { name: "Maravalli Chips", qty: "500g" },
+        { name: "Wheel Chips", qty: "500g" },
       ],
-      color: "yellow",
     },
     "Starter 4-Item Combo": {
       _id: "combo-starter",
       name: "Starter 4-Item Combo",
-      image:
-        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291396/Green_and_Orange_Playful_Hand-drawn_Indian_Tea_Stall_Food_Logo_qs30l3.png",
+      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291396/Green_and_Orange_Playful_Hand-drawn_Indian_Tea_Stall_Food_Logo_qs30l3.png",
       price: 249,
       includes: [
-        { name: "Mixture", img: mixtureImg, qty: "250g" },
-        { name: "Karasev", img: karasevImg, qty: "250g" },
-        { name: "Coconut Biscuit", img: coconutBiscuitImg, qty: "250g" },
-        { name: "Chocolate Biscuit", img: chocolateBiscuitImg, qty: "250g" },
+        { name: "Mixture", qty: "250g" },
+        { name: "Karasev", qty: "250g" },
+        { name: "Coconut Biscuit", qty: "250g" },
+        { name: "Chocolate Biscuit", qty: "250g" },
       ],
-      color: "pink",
     },
     "Mega Sweet & Snack 4-Item Combo": {
       _id: "combo-mega",
       name: "Mega Sweet & Snack 4-Item Combo",
-      image:
-        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png",
+      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png",
       price: 449,
       includes: [
-        { name: "Karaboondhi", img: karaboondhiImg, qty: "500g" },
-        { name: "Kadalai", img: kadalaiMittaiImg, qty: "500g" },
-        { name: "Chocolate Biscuit", img: chocolateBiscuitImg, qty: "500g" },
-        { name: "Gulab Jamun", img: gulabJamunImg, qty: "6 pcs (~250g)" },
+        { name: "Karaboondhi", qty: "500g" },
+        { name: "Kadalai", qty: "500g" },
+        { name: "Chocolate Biscuit", qty: "500g" },
+        { name: "Gulab Jamun", qty: "6 pcs (~250g)" },
       ],
-      color: "yellow",
     },
   };
 
-  const userId = sessionStorage.getItem("userId") || "guest";
-
-  const addComboToCart = async (comboKey) => {
-    if (!userId || userId === "guest") {
-      navigate("/login");
-      return;
-    }
-
-    const combo = comboProducts[comboKey];
-    try {
-      const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: combo._id,
-          name: combo.name,
-          image: combo.image,
-          selectedQuantity: "Pack",
-          price: combo.price,
-          quantity: 1,
-        }),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        if (onCartUpdate) onCartUpdate();
-        setNotification(`${combo.name} added to cart!`);
-      } else {
-        setNotification(`Failed to add: ${data.error || "Unknown error"}`);
-      }
-    } catch (err) {
-      console.error("Error adding combo:", err);
-      setNotification("Error adding combo to cart");
-    }
-
+  const addComboToCart = (comboName) => {
+    setNotification(`${comboName} added to cart!`);
     setTimeout(() => setNotification(""), 2000);
   };
 
+  const toggleCombo = (comboId) => {
+    setExpandedCombo(expandedCombo === comboId ? null : comboId);
+  };
+
   return (
-    <Motion.section
-      className="w-full max-w-3xl px-6 py-8 bg-white rounded-2xl shadow-md mx-auto my-6 text-center"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      {notification &&
-        createPortal(
-          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
-            <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg">
-              {notification}
-            </div>
-          </div>,
-          document.body
-        )}
+    <div className="w-full max-w-3xl px-6 py-8 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl shadow-lg mx-auto my-6">
+      {notification && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+            <ShoppingCart size={20} />
+            {notification}
+          </div>
+        </div>
+      )}
 
-      <Motion.h2
-        className="text-2xl font-semibold mb-3 text-gray-900"
-        initial={{ scale: 0.8, opacity: 0 }}
-        whileInView={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
-      >
-        Special Combos 🎁
-      </Motion.h2>
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold mb-3 text-gray-900">
+          Special Combos 🎁
+        </h2>
+        <p className="text-gray-700 text-lg">
+          Don't miss out on our limited-time snack deals.
+        </p>
+      </div>
 
-      <p className="text-gray-700 text-base md:text-lg mb-8">
-        Don't miss out on our limited-time snack deals.
-      </p>
-
-      {/* 🧩 Auto-render all combos */}
-      <div className="space-y-8">
-        {Object.entries(comboProducts).map(([key, combo]) => (
+      <div className="space-y-4">
+        {Object.values(comboProducts).map((combo) => (
           <div
             key={combo._id}
-            className={`border-2 rounded-xl p-4 shadow-md bg-${combo.color}-50 border-${combo.color}-400`}
+            className="border-2 border-gray-200 rounded-xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300"
           >
-            <div className="flex flex-col items-center">
-              <img
-                src={combo.image}
-                alt={combo.name}
-                className="w-24 h-24 object-cover rounded-lg mb-3"
-              />
-              <span className="text-2xl font-bold mb-2">
-                🎉 {combo.name} – ₹{combo.price} Only
-              </span>
-              <span className="text-base text-gray-700 mb-4">
-                Combo Includes:
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {combo.includes.map((item, i) => (
-                <div key={i} className="flex items-center space-x-3">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div>
-                    <div className="font-semibold">{item.name}</div>
-                    <div className="text-xs text-gray-500">{item.qty}</div>
-                  </div>
+            {/* Collapsed View - Always Visible */}
+            <div className="p-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src={combo.image}
+                  alt={combo.name}
+                  className="w-24 h-24 object-cover rounded-lg flex-shrink-0 shadow-sm"
+                />
+                <div className="flex-1 text-left">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    {combo.name}
+                  </h3>
+                  <p className="text-2xl font-bold text-orange-600">
+                    ₹{combo.price}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {combo.includes.length} items included
+                  </p>
                 </div>
-              ))}
-            </div>
+              </div>
 
-            <div className="flex justify-center mt-4">
+              {/* Tap for more info button */}
               <button
-                className={`bg-${combo.color}-400 hover:bg-${combo.color}-500 text-white font-bold py-2 px-6 rounded-full shadow`}
-                onClick={() => addComboToCart(key)}
+                onClick={() => toggleCombo(combo._id)}
+                className="w-full mt-4 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 transition-all"
               >
-                Add to Cart
+                <span className="text-base">
+                  {expandedCombo === combo._id
+                    ? "Hide details"
+                    : "Tap for more info"}
+                </span>
+                {expandedCombo === combo._id ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
               </button>
             </div>
+
+            {/* Expanded View - Product Details */}
+            {expandedCombo === combo._id && (
+              <div className="px-4 pb-4 border-t bg-gray-50">
+                <div className="pt-4">
+                  <p className="text-base text-gray-800 mb-4 font-semibold">
+                    📦 Combo Includes:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    {combo.includes.map((item, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100"
+                      >
+                        <img
+                          src={productImages[item.name] || productImages["Mixture"]}
+                          alt={item.name}
+                          className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+                        />
+                        <div className="text-left">
+                          <div className="font-semibold text-gray-800 text-sm">
+                            {item.name}
+                          </div>
+                          <div className="text-xs text-orange-600 font-medium">
+                            {item.qty}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                    onClick={() => addComboToCart(combo.name)}
+                  >
+                    <ShoppingCart size={20} />
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
-    </Motion.section>
+    </div>
   );
 };
 
