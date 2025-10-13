@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import { BASE_API_URL } from "../../config";
 
-// Import local images from assets
+// 🖼️ Import local product images
 import mixtureImg from "../../assets/mixture.jpeg";
 import murukkuImg from "../../assets/mullu re.jpg";
 import potatoImg from "../../assets/potato chips.jpg";
@@ -9,7 +11,7 @@ import pakkodaImg from "../../assets/Kadalai Pakkoda.jpg";
 import chandharakalaImg from "../../assets/chandrakala.jpg";
 import coconutBiscuitImg from "../../assets/coconut biscuit.jpg";
 import maravalliImg from "../../assets/maravalli.jpg";
-import wheelChipsImg from "../../assets/wheel-chips.jpg";
+import wheelChipsImg from "../../assets/wheel-Chips.jpg";
 import karasevImg from "../../assets/kaarasev.jpg";
 import karaboondhiImg from "../../assets/kaaraboondhi.jpg";
 import gulabJamunImg from "../../assets/gulab jamun.jpg";
@@ -21,45 +23,47 @@ const Offers = () => {
   const [notification, setNotification] = useState("");
   const [expandedCombo, setExpandedCombo] = useState(null);
 
-  // Product images mapping with imported assets
+  // 🖼️ Map product names to local image imports
   const productImages = {
-    "Mixture": mixtureImg,
-    "Murukku": murukkuImg,
+    Mixture: mixtureImg,
+    Murukku: murukkuImg,
     "Potato Chips": potatoImg,
     "Kadalai Pakkoda": pakkodaImg,
-    "Chandharakala (Sweet)": chandharakalaImg,
-    "Chandharakala": chandharakalaImg,
+    Chandharakala: chandharakalaImg,
     "Coconut Biscuit": coconutBiscuitImg,
     "Nendram Chips": nendramImg,
     "Chocolate Biscuit": chocolateBiscuitImg,
     "Kadalai Mittai": kadalaiMittaiImg,
-    "Karasev": karasevImg,
+    Karasev: karasevImg,
     "Maravalli Chips": maravalliImg,
     "Wheel Chips": wheelChipsImg,
-    "Karaboondhi": karaboondhiImg,
-    "Kadalai": kadalaiMittaiImg,
+    Karaboondhi: karaboondhiImg,
+    Kadalai: kadalaiMittaiImg,
     "Gulab Jamun": gulabJamunImg,
   };
 
+  // 🧺 Combo product data
   const comboProducts = {
     "Family Combo": {
       _id: "combo-family",
       name: "Crispii Family Combo",
-      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291342/Pink_Yellow_Fun_Comic_Thank_You_Instagram_Post_lxldoz.png",
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291342/Pink_Yellow_Fun_Comic_Thank_You_Instagram_Post_lxldoz.png",
       price: 420,
       includes: [
         { name: "Mixture", qty: "250g" },
         { name: "Murukku", qty: "250g" },
         { name: "Potato Chips", qty: "250g" },
         { name: "Kadalai Pakkoda", qty: "250g" },
-        { name: "Chandharakala (Sweet)", qty: "250g" },
+        { name: "Chandharakala", qty: "250g" },
         { name: "Coconut Biscuit", qty: "250g" },
       ],
     },
     "Premium Festive Box": {
       _id: "combo-premium",
       name: "Crispii Premium Festive Box",
-      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png",
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png",
       price: 750,
       includes: [
         { name: "Mixture", qty: "500g" },
@@ -75,7 +79,8 @@ const Offers = () => {
     "Crunch Combo": {
       _id: "combo-crunch",
       name: "Family 4-Item Combo",
-      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291391/Gold_and_Red_Indian_Truck_Art_Indian_Food_Logo_sgjrht.png",
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291391/Gold_and_Red_Indian_Truck_Art_Indian_Food_Logo_sgjrht.png",
       price: 399,
       includes: [
         { name: "Mixture", qty: "500g" },
@@ -87,7 +92,8 @@ const Offers = () => {
     "Starter 4-Item Combo": {
       _id: "combo-starter",
       name: "Starter 4-Item Combo",
-      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291396/Green_and_Orange_Playful_Hand-drawn_Indian_Tea_Stall_Food_Logo_qs30l3.png",
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291396/Green_and_Orange_Playful_Hand-drawn_Indian_Tea_Stall_Food_Logo_qs30l3.png",
       price: 249,
       includes: [
         { name: "Mixture", qty: "250g" },
@@ -99,7 +105,8 @@ const Offers = () => {
     "Mega Sweet & Snack 4-Item Combo": {
       _id: "combo-mega",
       name: "Mega Sweet & Snack 4-Item Combo",
-      image: "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png",
+      image:
+        "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png",
       price: 449,
       includes: [
         { name: "Karaboondhi", qty: "500g" },
@@ -110,25 +117,67 @@ const Offers = () => {
     },
   };
 
-  const addComboToCart = (comboName) => {
-    setNotification(`${comboName} added to cart!`);
-    setTimeout(() => setNotification(""), 2000);
+  // 🛒 Add combo to backend cart
+  const addComboToCart = async (combo) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setNotification("Please login to add items to cart.");
+        setTimeout(() => setNotification(""), 2000);
+        return;
+      }
+
+      const payload = {
+        productId: String(combo._id).trim(),
+        name: combo.name,
+        image: combo.image,
+        price: Number(combo.price),
+        quantity: 1,
+        isCombo: true,
+      };
+
+      const response = await fetch(`${BASE_API_URL}/api/cart/${userId}/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setNotification(`${combo.name} added to cart!`);
+      } else {
+        setNotification("Failed to add combo to cart.");
+      }
+    } catch (error) {
+      console.error("Add combo error:", error);
+      setNotification("Something went wrong. Try again.");
+    } finally {
+      setTimeout(() => setNotification(""), 2000);
+    }
   };
 
   const toggleCombo = (comboId) => {
     setExpandedCombo(expandedCombo === comboId ? null : comboId);
   };
 
+  // 🖼️ Component UI
   return (
     <div className="w-full max-w-3xl px-6 py-8 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl shadow-lg mx-auto my-6">
-      {notification && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
-            <ShoppingCart size={20} />
-            {notification}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {notification && (
+          <Motion.div
+            key="notif"
+            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+              <ShoppingCart size={20} />
+              {notification}
+            </div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold mb-3 text-gray-900">
@@ -145,7 +194,7 @@ const Offers = () => {
             key={combo._id}
             className="border-2 border-gray-200 rounded-xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300"
           >
-            {/* Collapsed View - Always Visible */}
+            {/* Collapsed View */}
             <div className="p-4">
               <div className="flex items-center gap-4">
                 <img
@@ -166,7 +215,6 @@ const Offers = () => {
                 </div>
               </div>
 
-              {/* Tap for more info button */}
               <button
                 onClick={() => toggleCombo(combo._id)}
                 className="w-full mt-4 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 transition-all"
@@ -184,7 +232,7 @@ const Offers = () => {
               </button>
             </div>
 
-            {/* Expanded View - Product Details */}
+            {/* Expanded View */}
             {expandedCombo === combo._id && (
               <div className="px-4 pb-4 border-t bg-gray-50">
                 <div className="pt-4">
@@ -192,13 +240,15 @@ const Offers = () => {
                     📦 Combo Includes:
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                    {combo.includes.map((item, i) => (
+                    {combo.includes.map((item) => (
                       <div
-                        key={i}
+                        key={`${combo._id}-${item.name}`}
                         className="flex items-center space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100"
                       >
                         <img
-                          src={productImages[item.name] || productImages["Mixture"]}
+                          src={
+                            productImages[item.name] || productImages["Mixture"]
+                          }
                           alt={item.name}
                           className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                         />
@@ -216,7 +266,7 @@ const Offers = () => {
 
                   <button
                     className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex items-center justify-center gap-2"
-                    onClick={() => addComboToCart(combo.name)}
+                    onClick={() => addComboToCart(combo)}
                   >
                     <ShoppingCart size={20} />
                     Add to Cart

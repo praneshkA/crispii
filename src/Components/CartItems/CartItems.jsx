@@ -163,9 +163,7 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
                   <h3 className="font-semibold text-sm mb-1 text-gray-800">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-2">
-                    Quantity: {item.selectedQuantity}
-                  </p>
+                  
                   <p className="text-green-600 font-bold">
                     ₹{item.price}
                   </p>

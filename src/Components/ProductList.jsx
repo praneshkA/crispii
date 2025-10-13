@@ -54,7 +54,7 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
             },
             {
               _id: 'combo-premium',
-              name: '🥳 CRISPII PREMIUM FESTIVE BOX',
+              name: 'CRISPII PREMIUM FESTIVE BOX',
               description: 'Mixture, Murukku, Potato Chips, Nendram Chips, Kadalai Pakkoda, Chandharakala, Chocolate Biscuit, Kadalai Mittai (500g each except 250g for sweets)',
               image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291371/Red_Elegance_Valentine_s_Day_Sale_Instagram_Post_koieo0.png',
               prices: { 'Pack': 750 },
