@@ -81,7 +81,7 @@ const ProductList = ({ category, onCartUpdate, userId = "guest", isMenuOpen }) =
             },
             {
               _id: 'combo-mega',
-              name: '🍬 Mega Sweet & Snack 4-Item Combo',
+              name: '🍬 Sweet & Snack 4-Item Combo',
               description: 'Karaboondhi, Kadalai, Chocolate Biscuit (500g each), Gulab Jamun (6 pcs ~250g)',
               image: 'https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png',
               prices: { 'Pack': 449 },

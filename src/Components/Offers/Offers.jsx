@@ -104,7 +104,7 @@ const Offers = () => {
     },
     "Mega Sweet & Snack 4-Item Combo": {
       _id: "combo-mega",
-      name: "Mega Sweet & Snack 4-Item Combo",
+      name: "Sweet & Snack 4-Item Combo",
       image:
         "https://res.cloudinary.com/dzvimdj7w/image/upload/v1760291385/Yellow_and_Orange_Floral_Indian_Fashion_Boutique_Logo_w2y9pz.png",
       price: 449,

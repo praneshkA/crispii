@@ -110,7 +110,7 @@ const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
             }}
           >
             <div className="text-4xl font-bold text-yellow-500 drop-shadow-lg">
-              🎉 Yay! 🎉
+              🎉 Yeah! 🎉
             </div>
             <div className="text-xl font-semibold text-gray-700 mt-2">
               Your cart is ready!
