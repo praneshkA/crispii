@@ -9,7 +9,7 @@ import pakkodaImg from "../../assets/Kadalai Pakkoda.jpg";
 import chandharakalaImg from "../../assets/chandrakala.jpg";
 import coconutBiscuitImg from "../../assets/coconut biscuit.jpg";
 import maravalliImg from "../../assets/maravalli.jpg";
-import wheelChipsImg from "../../assets/wheel-Chips.jpg";
+import wheelChipsImg from "../../assets/wheel-chips.jpg";
 import karasevImg from "../../assets/kaarasev.jpg";
 import karaboondhiImg from "../../assets/kaaraboondhi.jpg";
 import gulabJamunImg from "../../assets/gulab jamun.jpg";
