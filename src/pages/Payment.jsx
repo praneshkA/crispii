@@ -8,7 +8,7 @@ import { BASE_API_URL } from "../config";
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { formData, cartItems, totalAmount } = location.state || {};
+  const { formData, cartItems, subtotal, deliveryFee, totalAmount } = location.state || {};
 
   const [uploaded, setUploaded] = useState(false);
   const [file, setFile] = useState(null);
@@ -46,9 +46,9 @@ const Payment = () => {
     const authToken = sessionStorage.getItem('authToken');
     const userId = sessionStorage.getItem('userId') || 'guest';
     if (!authToken || userId === 'guest') {
-      navigate('/login', { state: { from: '/payment', returnState: { formData, cartItems, totalAmount } } });
+      navigate('/login', { state: { from: '/payment', returnState: { formData, cartItems, subtotal, deliveryFee, totalAmount } } });
     }
-  }, [formData, cartItems, totalAmount, navigate]);
+  }, [formData, cartItems, subtotal, deliveryFee, totalAmount, navigate]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -181,9 +181,22 @@ const Payment = () => {
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
               Complete Payment
             </h1>
-            <p className="text-xl font-bold text-blue-600 mt-2">
-              ₹{totalAmount?.toFixed(2)}
-            </p>
+            
+            {/* Amount Breakdown */}
+            <div className="bg-gray-50 rounded-lg p-4 mt-4 text-sm">
+              <div className="flex justify-between text-gray-600 mb-1">
+                <span>Subtotal</span>
+                <span>₹{subtotal?.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-gray-600 mb-2">
+                <span>Delivery Fee</span>
+                <span>{deliveryFee > 0 ? `₹${deliveryFee?.toFixed(2)}` : 'Free'}</span>
+              </div>
+              <div className="flex justify-between font-bold text-blue-600 border-t pt-2">
+                <span>Total Amount</span>
+                <span>₹{totalAmount?.toFixed(2)}</span>
+              </div>
+            </div>
           </div>
 
           {/* UPI Payment Section */}
@@ -287,9 +300,24 @@ const Payment = () => {
           <p className="text-gray-600">
             Scan the QR code below and upload your payment screenshot
           </p>
-          <p className="text-xl font-bold text-gray-800 mt-3">
-            Total Amount: ₹{totalAmount?.toFixed(2)}
-          </p>
+          
+          {/* Amount Breakdown */}
+          <div className="bg-gray-50 rounded-lg p-4 mt-4 inline-block min-w-[300px]">
+            <div className="flex justify-between text-gray-600 mb-2">
+              <span className="text-sm">Subtotal</span>
+              <span className="text-sm font-semibold">₹{subtotal?.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-gray-600 mb-3">
+              <span className="text-sm">Delivery Fee</span>
+              <span className="text-sm font-semibold">
+                {deliveryFee > 0 ? `₹${deliveryFee?.toFixed(2)}` : 'Free'}
+              </span>
+            </div>
+            <div className="flex justify-between font-bold text-blue-600 border-t pt-3">
+              <span>Total Amount</span>
+              <span className="text-xl">₹{totalAmount?.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-9">
