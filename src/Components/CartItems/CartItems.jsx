@@ -1,309 +1,285 @@
-import React, { useState } from "react";
+// frontend/src/Components/CartItems.jsx
+import React from "react";
+import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { BASE_API_URL } from '../../config';
 import { useNavigate } from "react-router-dom";
 
-const Checkout = ({ cartItems = [] }) => {
-  const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    address: "",
-    apartment: "",
-    city: "",
-    state: "Tamil Nadu",
-    pincode: "",
-    phone: "",
-  });
-
+const CartItems = ({ cartItems, updateCart, removeFromCart, userId }) => {
   const navigate = useNavigate();
+  const [showCrackers, setShowCrackers] = React.useState(false);
+  const isInitialMount = React.useRef(true);
 
-  const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
-  const totalAmount = safeCartItems.reduce(
-    (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
-    0
-  );
-  const deliveryFee = totalAmount < 349 && totalAmount > 0 ? 70 : 0;
-  const grandTotal = totalAmount + deliveryFee;
+  // Delivery charge constant
+  const DELIVERY_CHARGE = 50;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
+  // If user is not logged in, redirect to login page
+  React.useEffect(() => {
+    const authToken = sessionStorage.getItem('authToken');
+    const uid = userId || sessionStorage.getItem('userId') || 'guest';
+    if (!authToken || uid === 'guest') {
+      navigate('/login', { state: { from: '/cart' } });
     }
-  };
+  }, [navigate, userId]);
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    // First name validation
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    } else if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = "First name must be at least 2 characters";
-    }
-
-    // Last name validation (optional but if provided, check length)
-    if (formData.lastName && formData.lastName.trim().length < 2) {
-      newErrors.lastName = "Last name must be at least 2 characters";
-    }
-
-    // Address validation
-    if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
-    } else if (formData.address.trim().length < 10) {
-      newErrors.address = "Please enter a complete address";
-    }
-
-    // City validation
-    if (!formData.city.trim()) {
-      newErrors.city = "City is required";
-    }
-
-    // PIN code validation
-    if (!formData.pincode.trim()) {
-      newErrors.pincode = "PIN code is required";
-    } else if (!/^\d{6}$/.test(formData.pincode)) {
-      newErrors.pincode = "PIN code must be 6 digits";
-    }
-
-    // Phone validation
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone number must be 10 digits";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (safeCartItems.length === 0) {
-      alert("Your cart is empty. Please add items before proceeding.");
+  // Trigger crackers animation when items are added to cart
+  React.useEffect(() => {
+    // Skip animation on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       return;
     }
 
-    if (!validateForm()) {
-      return;
+    // Only show animation when cart has items
+    if (cartItems.length > 0) {
+      setShowCrackers(true);
+      const timer = setTimeout(() => setShowCrackers(false), 3000);
+      return () => clearTimeout(timer);
     }
+  }, [cartItems.length]);
 
-    // Pass data to Payment page with delivery fee breakdown
-    navigate("/payment", {
-      state: {
-        formData,
-        cartItems: safeCartItems,
-        subtotal: totalAmount,
-        deliveryFee: deliveryFee,
-        totalAmount: grandTotal, // This now includes delivery fee
-      },
-    });
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => {
+      return total + (item.price * item.quantity);
+    }, 0);
   };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + DELIVERY_CHARGE;
+  };
+
+  const increaseQuantity = (item) => {
+    updateCart(item.productId, item.selectedQuantity, item.quantity + 1);
+  };
+
+  const decreaseQuantity = (item) => {
+    if (item.quantity > 1) {
+      updateCart(item.productId, item.selectedQuantity, item.quantity - 1);
+    } else {
+      removeFromCart(item.productId, item.selectedQuantity);
+    }
+  };
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-gray-500 px-4">
+        <ShoppingBag size={64} className="mb-4 text-gray-300" />
+        <p className="text-xl font-semibold mb-2">Your cart is empty</p>
+        <p className="text-sm text-gray-400">Add some products to get started!</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-xl mx-auto p-4 border rounded">
-      <h1 className="text-lg font-semibold mb-2">Crispii Snacks</h1>
+    <div className="w-full bg-gray-50 min-h-screen pb-6 relative">
+      {/* Crackers Animation */}
+      {showCrackers && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {/* Confetti particles */}
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: '-10px',
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                backgroundColor: ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d96ff', '#ff69eb'][Math.floor(Math.random() * 5)],
+                borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                animation: `confetti ${Math.random() * 2 + 2}s linear ${Math.random() * 0.5}s forwards`,
+                transform: `rotate(${Math.random() * 360}deg)`
+              }}
+            />
+          ))}
+          
+          {/* Sparkles */}
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={`sparkle-${i}`}
+              className="absolute"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 50}%`,
+                fontSize: `${Math.random() * 20 + 15}px`,
+                animation: `sparkle ${Math.random() * 1 + 1}s ease-in-out ${Math.random() * 1}s infinite`
+              }}
+            >
+              ✨
+            </div>
+          ))}
 
-      {/* Order Summary - Always Open */}
-      <div className="border rounded mb-4 bg-gray-50">
-        <div className="w-full flex justify-between px-3 py-2 bg-gray-100 border-b">
-          <span className="font-semibold">Order summary</span>
-          <span className="font-bold">₹{grandTotal.toFixed(2)}</span>
+          {/* Celebration text */}
+          <div 
+            className="absolute top-1/4 left-1/2 text-center"
+            style={{
+              transform: 'translate(-50%, -50%)',
+              animation: 'bounce-in 0.6s ease-out'
+            }}
+          >
+            <div className="text-4xl font-bold text-yellow-500 drop-shadow-lg">
+              🎉 Yeah! 🎉
+            </div>
+            <div className="text-xl font-semibold text-gray-700 mt-2">
+              Your cart is ready!
+            </div>
+          </div>
         </div>
+      )}
 
-        <div className="px-3 py-2 text-sm">
-          {safeCartItems.length > 0 ? (
-            <>
-              {safeCartItems.map((item) => {
-                const qty = item.quantity || 1;
-                const variant = item.selectedQuantity || "";
-                const lineTotal = (item.price || 0) * qty;
-                const key =
-                  item._id ||
-                  item.productId ||
-                  `${item.name}-${variant}-${qty}`;
-                return (
-                  <div
-                    key={key}
-                    className="flex justify-between py-1 items-center"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{item.name}</span>
-                      {variant && (
-                        <span className="text-xs text-gray-500">{variant}</span>
-                      )}
-                      <span className="text-xs text-gray-500">
-                        Qty: {qty}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <div>₹{lineTotal.toFixed(2)}</div>
-                      <div className="text-xs text-gray-500">
-                        ₹{(item.price || 0).toFixed(2)} each
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-              <div className="flex justify-between py-1 items-center border-t mt-2 pt-2">
-                <span className="font-medium">Subtotal</span>
-                <span>₹{totalAmount.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between py-1 items-center">
-                <span className="font-medium">Delivery Fee</span>
-                <span>{deliveryFee > 0 ? `₹${deliveryFee}` : 'Free'}</span>
-              </div>
-              <div className="flex justify-between py-1 items-center border-t mt-2 pt-2 text-base font-bold">
-                <span>Total</span>
-                <span>₹{grandTotal.toFixed(2)}</span>
-              </div>
-            </>
-          ) : (
-            <p className="text-gray-500">Your cart is empty.</p>
-          )}
+      {/* Header */}
+      <div className="bg-white shadow-sm mb-4 sticky top-0 z-10">
+        <div className="px-4 py-4">
+          <h1 className="text-xl font-bold text-gray-800">Shopping Cart</h1>
+          <p className="text-sm text-gray-500">{cartItems.length} items</p>
         </div>
       </div>
 
-      {/* Delivery Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <h3 className="font-semibold text-2xl mt-8">Delivery</h3>
+      <div className="px-4 max-w-4xl mx-auto">
+        {/* Cart Items */}
+        <div className="space-y-3 mb-6">
+          {cartItems.map((item) => {
+            const server = BASE_API_URL;
+            let imgPath = item.image || "";
+            let src = imgPath.startsWith("http")
+              ? imgPath
+              : `${server}${imgPath}`;
 
-        {/* First Name */}
-        <div>
-          <label className="block text-sm mb-1">First name</label>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className={`w-full border rounded px-2 py-1 ${errors.firstName ? 'border-red-500' : ''}`}
-          />
-          {errors.firstName && (
-            <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
-          )}
+            return (
+              <div
+                key={`${item.productId}-${item.selectedQuantity}`}
+                className="bg-white rounded-lg shadow p-3 flex gap-3"
+              >
+                {/* Product Image */}
+                <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                  <img
+                    src={src}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Only set fallback if not already set to fallback URL
+                      if (!e.currentTarget.src.includes('no-image.png')) {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://res.cloudinary.com/dzvimdj7w/image/upload/v123456/no-image.png";
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Product Details */}
+                <div className="flex-grow">
+                  <h3 className="font-semibold text-sm mb-1 text-gray-800">
+                    {item.name}
+                  </h3>
+                  
+                  <p className="text-green-600 font-bold">
+                    ₹{item.price}
+                  </p>
+                </div>
+
+                {/* Quantity Controls */}
+                <div className="flex flex-col items-end justify-between">
+                  <button
+                    onClick={() => removeFromCart(item.productId, item.selectedQuantity)}
+                    className="text-red-500 hover:text-red-700 p-1"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+
+                  <div className="flex items-center gap-2 border rounded-full px-2 py-1">
+                    <button
+                      onClick={() => decreaseQuantity(item)}
+                      className="text-gray-600 hover:text-gray-800"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="text-sm font-semibold w-6 text-center">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => increaseQuantity(item)}
+                      className="text-gray-600 hover:text-gray-800"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Last Name */}
-        <div>
-          <label className="block text-sm mb-1">Last name</label>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className={`w-full border rounded px-2 py-1 ${errors.lastName ? 'border-red-500' : ''}`}
-          />
-          {errors.lastName && (
-            <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
-          )}
-        </div>
+        {/* Cart Summary */}
+        <div className="bg-white rounded-lg shadow p-4 sticky bottom-4">
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between items-center text-gray-600">
+              <span>Subtotal</span>
+              <span className="font-semibold">
+                ₹{calculateSubtotal().toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-gray-600">
+              <span>Delivery Charge</span>
+              <span className="font-semibold">
+                ₹{DELIVERY_CHARGE.toFixed(2)}
+              </span>
+            </div>
+            <div className="border-t pt-2 flex justify-between items-center">
+              <span className="text-lg font-bold text-gray-800">Total</span>
+              <span className="text-xl font-bold text-gray-800">
+                ₹{calculateTotal().toFixed(2)}
+              </span>
+            </div>
+          </div>
 
-        {/* Address */}
-        <div>
-          <label className="block text-sm mb-1">Address</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            className={`w-full border rounded px-2 py-1 ${errors.address ? 'border-red-500' : ''}`}
-          />
-          {errors.address && (
-            <p className="text-red-500 text-xs mt-1">{errors.address}</p>
-          )}
-        </div>
-
-        {/* Apartment */}
-        <div>
-          <label className="block text-sm mb-1">
-            Apartment, suite, etc. (optional)
-          </label>
-          <input
-            type="text"
-            name="apartment"
-            value={formData.apartment}
-            onChange={handleChange}
-            className="w-full border rounded px-2 py-1"
-          />
-        </div>
-
-        {/* City */}
-        <div>
-          <label className="block text-sm mb-1">City</label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            className={`w-full border rounded px-2 py-1 ${errors.city ? 'border-red-500' : ''}`}
-          />
-          {errors.city && (
-            <p className="text-red-500 text-xs mt-1">{errors.city}</p>
-          )}
-        </div>
-
-        {/* State */}
-        <div>
-          <label className="block text-sm mb-1">State</label>
-          <select
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            className="w-full border rounded px-2 py-1"
+          {/* Checkout Button */}
+          <button
+            onClick={() => navigate("/checkout")}
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-6 rounded-xl shadow transition-transform duration-200 hover:scale-105 focus:ring-2 focus:ring-yellow-300"
           >
-            <option>Tamil Nadu</option>
-            <option>Kerala</option>
-            <option>Karnataka</option>
-            <option>Andhra Pradesh</option>
-            <option>Telangana</option>
-          </select>
+            Proceed to Checkout
+          </button>
         </div>
+      </div>
 
-        {/* PIN Code */}
-        <div>
-          <label className="block text-sm mb-1">PIN code</label>
-          <input
-            type="text"
-            name="pincode"
-            value={formData.pincode}
-            onChange={handleChange}
-            maxLength="6"
-            className={`w-full border rounded px-2 py-1 ${errors.pincode ? 'border-red-500' : ''}`}
-          />
-          {errors.pincode && (
-            <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>
-          )}
-        </div>
+      <style>{`
+        @keyframes confetti {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
 
-        {/* Phone */}
-        <div>
-          <label className="block text-sm mb-1">Phone number</label>
-          <input
-            type="text"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            maxLength="10"
-            className={`w-full border rounded px-2 py-1 ${errors.phone ? 'border-red-500' : ''}`}
-          />
-          {errors.phone && (
-            <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-          )}
-        </div>
+        @keyframes sparkle {
+          0%, 100% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.5);
+          }
+        }
 
-        <button
-          type="submit"
-          className="w-full border rounded px-4 py-2 mt-4 font-medium bg-green-600 text-white hover:bg-green-700"
-          disabled={safeCartItems.length === 0}
-        >
-          Proceed to Payment
-        </button>
-      </form>
+        @keyframes bounce-in {
+          0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.2);
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };
 
-export default Checkout;
+export default CartItems;

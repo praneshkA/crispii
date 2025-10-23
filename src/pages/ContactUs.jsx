@@ -10,7 +10,7 @@ const ContactUs = () => {
       </p>
   <p className="text-lg mb-1">Email: <a href="mailto:support@crispii.live" className="underline text-blue-600 hover:text-blue-800">support@crispii.live</a></p>
       <p className="text-lg mb-1">Phone: 8248928998, 9976121007</p>
-      <p className="text-lg">Address: 79,Muthusamy Gounder layout sv mill post , Udumalpet, India, 642128</p>
+      <p className="text-lg">Address: 79,Muthusamy Gounder layout sv mill post , Udumalpet,TamilNadu, 642128</p>
     </div>
   );
 };

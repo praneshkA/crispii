@@ -1,29 +1,38 @@
-//ScrollingBanner.jsx
+// ScrollingBanner.jsx
 import React from "react";
 
 const ScrollingBanner = () => {
   const messages = [
-    "Time to crunch into your favorites 😋",
     "🚚 Free delivery on orders above ₹399",
     "🥗 No preservatives",
     "🌟 Authentic Taste",
     "🌴 No palm oil",
     "🧑‍🍳 Crafted by Experts",
-    "💯 Quality Guaranteed"
+    "💯 Quality Guaranteed",
+    "Time to crunch into your favorites 😋",
   ];
 
   return (
-  <div className="overflow-hidden bg-black text-white px-2 py-0.5 w-full h-8" style={{ borderRadius: '0px', height: '2.5rem', minHeight: '2.5rem', margin: 0, padding: 0 }}>
-      <div
-        className="inline-block whitespace-nowrap animate-scroll px-4 py-2"
-        style={{ display: "flex", gap: "4rem" }}
+    <div
+      className="bg-black text-white w-full"
+      style={{
+        borderRadius: "0px",
+        height: "2.5rem",
+        display: "flex",
+        alignItems: "center",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      }}
+    >
+      <marquee
+        behavior="scroll"        // ✅ continuous scrolling
+        direction="left"         // ✅ moves from right → left
+        scrollamount="6"         // ✅ control speed (higher = faster)
+        loop="infinite"          // ✅ infinite repeat
+        className="text-lg font-semibold"
       >
-        {messages.map((msg, idx) => (
-          <span key={idx} className="font-semibold text-lg">
-            {msg}
-          </span>
-        ))}
-      </div>
+        {messages.join(" • ")} {/* bullet separator between messages */}
+      </marquee>
     </div>
   );
 };
